@@ -1,0 +1,29 @@
+# Flutter / Dart
+.dart_tool/
+.packages
+.pub-cache/
+build/
+.flutter-plugins
+.flutter-plugins-dependencies
+.melos_tool/
+
+# IDE
+.vscode/
+.idea/
+*.iml
+
+# Platform build stuff
+android/.gradle/
+android/app/release/
+ios/Pods/
+ios/.symlinks/
+macos/Flutter/ephemeral/
+linux/flutter/ephemeral/
+windows/flutter/ephemeral/
+web/.dart_tool/
+
+# Keys / secrets
+**/*.keystore
+**/*.jks
+**/*.pem
+**/*.p12
