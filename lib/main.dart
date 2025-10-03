@@ -54,7 +54,7 @@ class LuxeWatchApp extends StatelessWidget {
   }
 }
 
-/* =============================== DATA ================================== */
+/* DATA */
 
 class Product {
   final String id, brand, name, image;
