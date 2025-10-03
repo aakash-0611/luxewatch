@@ -1,122 +1,487 @@
 import 'package:flutter/material.dart';
 
-void main() {
-  runApp(const MyApp());
-}
+void main() => runApp(const LuxeWatchApp());
 
-class MyApp extends StatelessWidget {
-  const MyApp({super.key});
+class LuxeWatchApp extends StatelessWidget {
+  const LuxeWatchApp({super.key});
 
-  // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Flutter Demo',
-      theme: ThemeData(
-        // This is the theme of your application.
-        //
-        // TRY THIS: Try running your application with "flutter run". You'll see
-        // the application has a purple toolbar. Then, without quitting the app,
-        // try changing the seedColor in the colorScheme below to Colors.green
-        // and then invoke "hot reload" (save your changes or press the "hot
-        // reload" button in a Flutter-supported IDE, or press "r" if you used
-        // the command line to start the app).
-        //
-        // Notice that the counter didn't reset back to zero; the application
-        // state is not lost during the reload. To reset the state, use hot
-        // restart instead.
-        //
-        // This works for code too, not just values: Most code changes can be
-        // tested with just a hot reload.
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
+    // LIGHT THEME
+    final ThemeData light = ThemeData(
+      useMaterial3: true,
+      colorScheme: ColorScheme.fromSeed(
+        seedColor: const Color(0xFFD4AF37),
+        brightness: Brightness.light,
       ),
-      home: const MyHomePage(title: 'Flutter Demo Home Page'),
+      cardTheme: const CardThemeData(
+        color: Colors.white,
+        elevation: 1,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.all(Radius.circular(16)),
+        ),
+        clipBehavior: Clip.antiAlias,
+      ),
+    );
+
+    //  DARK THEME
+    final ThemeData dark = ThemeData(
+      useMaterial3: true,
+      colorScheme: ColorScheme.fromSeed(
+        seedColor: const Color(0xFFD4AF37),
+        brightness: Brightness.dark,
+      ),
+      scaffoldBackgroundColor: const Color(0xFF0B0F14),
+      cardTheme: const CardThemeData(
+        color: Color(0xFF12161C),
+        elevation: 1,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.all(Radius.circular(16)),
+        ),
+        clipBehavior: Clip.antiAlias,
+      ),
+    );
+
+
+    return MaterialApp(
+      debugShowCheckedModeBanner: false,
+      title: 'LuxeWatch',
+      theme: light,
+      darkTheme: dark,
+      themeMode: ThemeMode.system, // follows device setting
+      home: const HomeShell(),
     );
   }
 }
 
-class MyHomePage extends StatefulWidget {
-  const MyHomePage({super.key, required this.title});
+/* =============================== DATA ================================== */
 
-  // This widget is the home page of your application. It is stateful, meaning
-  // that it has a State object (defined below) that contains fields that affect
-  // how it looks.
-
-  // This class is the configuration for the state. It holds the values (in this
-  // case the title) provided by the parent (in this case the App widget) and
-  // used by the build method of the State. Fields in a Widget subclass are
-  // always marked "final".
-
-  final String title;
-
-  @override
-  State<MyHomePage> createState() => _MyHomePageState();
+class Product {
+  final String id, brand, name, image;
+  final double price;
+  final double? oldPrice; // null means no old price
+  final double rating; // 0..5
+  final bool onSale;
+  const Product({
+    required this.id,
+    required this.brand,
+    required this.name,
+    required this.image,
+    required this.price,
+    this.oldPrice,
+    this.rating = 4.6,
+    this.onSale = false,
+  });
 }
 
-class _MyHomePageState extends State<MyHomePage> {
-  int _counter = 0;
+const List<Product> kProducts = [
+  Product(
+    id: 'p1',
+    brand: 'Audemars Piguet',
+    name: 'Royal Oak Classic',
+    image: 'https://picsum.photos/seed/aw1/800/800',
+    price: 25000,
+    oldPrice: 28000,
+    rating: 4.8,
+  ),
+  Product(
+    id: 'p2',
+    brand: 'Omega',
+    name: 'Speedmaster Gold',
+    image: 'https://picsum.photos/seed/aw2/800/800',
+    price: 18500,
+    rating: 4.6,
+  ),
+  Product(
+    id: 'p3',
+    brand: 'Patek Philippe',
+    name: 'Calatrava Heritage',
+    image: 'https://picsum.photos/seed/aw3/800/800',
+    price: 32000,
+    rating: 4.9,
+  ),
+  Product(
+    id: 'p4',
+    brand: 'Omega',
+    name: 'Constellation Elite',
+    image: 'https://picsum.photos/seed/aw4/800/800',
+    price: 22000,
+    oldPrice: 26000,
+    rating: 4.7,
+    onSale: true,
+  ),
+  Product(
+    id: 'p5',
+    brand: 'Rolex',
+    name: 'Day-Date Platinum',
+    image: 'https://picsum.photos/seed/aw5/800/800',
+    price: 54000,
+    rating: 4.9,
+  ),
+  Product(
+    id: 'p6',
+    brand: 'Cartier',
+    name: 'Santos De Cartier',
+    image: 'https://picsum.photos/seed/aw6/800/800',
+    price: 7800,
+    oldPrice: 9200,
+    rating: 4.5,
+    onSale: true,
+  ),
+  Product(
+    id: 'p7',
+    brand: 'TAG Heuer',
+    name: 'Carrera Sport',
+    image: 'https://picsum.photos/seed/aw7/800/800',
+    price: 5600,
+    rating: 4.4,
+  ),
+  Product(
+    id: 'p8',
+    brand: 'Tissot',
+    name: 'Gentleman Powermatic',
+    image: 'https://picsum.photos/seed/aw8/800/800',
+    price: 850,
+    rating: 4.2,
+  ),
+];
 
-  void _incrementCounter() {
-    setState(() {
-      // This call to setState tells the Flutter framework that something has
-      // changed in this State, which causes it to rerun the build method below
-      // so that the display can reflect the updated values. If we changed
-      // _counter without calling setState(), then the build method would not be
-      // called again, and so nothing would appear to happen.
-      _counter++;
-    });
-  }
+/* ============================== SHELL =================================== */
+
+class HomeShell extends StatefulWidget {
+  const HomeShell({super.key});
+  @override
+  State<HomeShell> createState() => _HomeShellState();
+}
+
+class _HomeShellState extends State<HomeShell> {
+  int _index = 0;
+
+  void _soon() => ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Coming soon (demo)')),
+      );
 
   @override
   Widget build(BuildContext context) {
-    // This method is rerun every time setState is called, for instance as done
-    // by the _incrementCounter method above.
-    //
-    // The Flutter framework has been optimized to make rerunning build methods
-    // fast, so that you can just rebuild anything that needs updating rather
-    // than having to individually change instances of widgets.
-    return Scaffold(
-      appBar: AppBar(
-        // TRY THIS: Try changing the color here to a specific color (to
-        // Colors.amber, perhaps?) and trigger a hot reload to see the AppBar
-        // change color while the other colors stay the same.
-        backgroundColor: Theme.of(context).colorScheme.inversePrimary,
-        // Here we take the value from the MyHomePage object that was created by
-        // the App.build method, and use it to set our appbar title.
-        title: Text(widget.title),
+    return LayoutBuilder(
+      builder: (_, constraints) {
+        final bool isTablet = constraints.maxWidth >= 900;
+
+        final Widget body = LuxeHome(isTablet: isTablet);
+
+        if (!isTablet) {
+          // PHONE: bottom nav
+          return Scaffold(
+            body: body,
+            bottomNavigationBar: NavigationBar(
+              selectedIndex: _index,
+              onDestinationSelected: (i) {
+                setState(() => _index = i);
+                if (i != 0) _soon(); // keep Home only for now
+              },
+              destinations: const [
+                NavigationDestination(icon: Icon(Icons.home), label: 'Home'),
+                NavigationDestination(icon: Icon(Icons.search), label: 'Search'),
+                NavigationDestination(icon: Icon(Icons.favorite_border), label: 'Wishlist'),
+                NavigationDestination(icon: Icon(Icons.shopping_cart_outlined), label: 'Cart'),
+                NavigationDestination(icon: Icon(Icons.person_outline), label: 'Profile'),
+              ],
+            ),
+          );
+        }
+
+        // TABLET: side rail
+        return Scaffold(
+          body: Row(
+            children: [
+              NavigationRail(
+                selectedIndex: _index,
+                onDestinationSelected: (i) {
+                  setState(() => _index = i);
+                  if (i != 0) _soon();
+                },
+                extended: true,
+                leading: Padding(
+                  padding: const EdgeInsets.all(8),
+                  child: CircleAvatar(
+                    backgroundColor: Theme.of(context).colorScheme.primary,
+                    child: const Text('W'),
+                  ),
+                ),
+                destinations: const [
+                  NavigationRailDestination(
+                    icon: Icon(Icons.home_outlined),
+                    selectedIcon: Icon(Icons.home),
+                    label: Text('Home'),
+                  ),
+                  NavigationRailDestination(icon: Icon(Icons.search), label: Text('Search')),
+                  NavigationRailDestination(icon: Icon(Icons.favorite_border), label: Text('Wishlist')),
+                  NavigationRailDestination(icon: Icon(Icons.shopping_cart_outlined), label: Text('Cart')),
+                  NavigationRailDestination(icon: Icon(Icons.person_outline), label: Text('Profile')),
+                ],
+              ),
+              const VerticalDivider(width: 1),
+              Expanded(child: body),
+            ],
+          ),
+        );
+      },
+    );
+  }
+}
+
+/* ============================== HOME ==================================== */
+
+class LuxeHome extends StatelessWidget {
+  final bool isTablet;
+  const LuxeHome({super.key, required this.isTablet});
+
+  @override
+  Widget build(BuildContext context) {
+    final cs = Theme.of(context).colorScheme;
+
+    return CustomScrollView(
+      slivers: [
+        SliverAppBar(
+          pinned: true,
+          title: const Text('LuxeWatch'),
+          actions: const [
+            Padding(
+              padding: EdgeInsets.only(right: 12),
+              child: CircleAvatar(radius: 16, child: Text('JD')),
+            ),
+          ],
+        ),
+
+        // Tablet hero (landscape)
+        if (isTablet)
+          SliverToBoxAdapter(
+            child: Padding(
+              padding: const EdgeInsets.all(16),
+              child: _HeroCard(),
+            ),
+          ),
+
+        // Categories (chips)
+        SliverToBoxAdapter(
+          child: SizedBox(
+            height: 44,
+            child: ListView(
+              padding: const EdgeInsets.symmetric(horizontal: 12),
+              scrollDirection: Axis.horizontal,
+              children: const [
+                _CategoryChip(label: 'All', selected: true),
+                _CategoryChip(label: 'Sports'),
+                _CategoryChip(label: 'Dress'),
+                _CategoryChip(label: 'Vintage'),
+                _CategoryChip(label: 'Limited'),
+              ],
+            ),
+          ),
+        ),
+        const SliverToBoxAdapter(child: SizedBox(height: 8)),
+
+        // Product grid
+        SliverPadding(
+          padding: const EdgeInsets.all(12),
+          sliver: SliverGrid(
+            delegate: SliverChildBuilderDelegate(
+              (context, i) => ProductCard(product: kProducts[i]),
+              childCount: kProducts.length,
+            ),
+            gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+              crossAxisCount: isTablet ? 4 : 2,
+              crossAxisSpacing: 12,
+              mainAxisSpacing: 12,
+              childAspectRatio: 0.74,
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+/* ============================ UI WIDGETS ================================= */
+
+class _CategoryChip extends StatelessWidget {
+  final String label;
+  final bool selected;
+  const _CategoryChip({required this.label, this.selected = false});
+
+  @override
+  Widget build(BuildContext context) {
+    final cs = Theme.of(context).colorScheme;
+    return Container(
+      margin: const EdgeInsets.only(right: 8),
+      child: FilterChip(
+        selected: selected,
+        onSelected: (_) {},
+        label: Text(label),
+        selectedColor: cs.primary.withOpacity(0.18),
+        showCheckmark: false,
       ),
-      body: Center(
-        // Center is a layout widget. It takes a single child and positions it
-        // in the middle of the parent.
-        child: Column(
-          // Column is also a layout widget. It takes a list of children and
-          // arranges them vertically. By default, it sizes itself to fit its
-          // children horizontally, and tries to be as tall as its parent.
-          //
-          // Column has various properties to control how it sizes itself and
-          // how it positions its children. Here we use mainAxisAlignment to
-          // center the children vertically; the main axis here is the vertical
-          // axis because Columns are vertical (the cross axis would be
-          // horizontal).
-          //
-          // TRY THIS: Invoke "debug painting" (choose the "Toggle Debug Paint"
-          // action in the IDE, or press "p" in the console), to see the
-          // wireframe for each widget.
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[
-            const Text('You have pushed the button this many times:'),
-            Text(
-              '$_counter',
-              style: Theme.of(context).textTheme.headlineMedium,
+    );
+  }
+}
+
+class _HeroCard extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    final cs = Theme.of(context).colorScheme;
+    return Card(
+      child: Padding(
+        padding: const EdgeInsets.all(16),
+        child: Row(
+          children: [
+            // text
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text('Good Morning', style: Theme.of(context).textTheme.titleLarge),
+                  const SizedBox(height: 6),
+                  const Text('Discover exquisite timepieces'),
+                  const SizedBox(height: 12),
+                  Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                    decoration: BoxDecoration(
+                      color: cs.primary.withOpacity(0.16),
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    child: const Text('New Collection • Heritage Series'),
+                  ),
+                  const SizedBox(height: 12),
+                  FilledButton(onPressed: () {}, child: const Text('Explore Collection')),
+                ],
+              ),
+            ),
+            const SizedBox(width: 16),
+            // image
+            ClipRRect(
+              borderRadius: BorderRadius.circular(12),
+              child: Image.network(
+                'https://picsum.photos/seed/heritage/420/280',
+                height: 140,
+                width: 180,
+                fit: BoxFit.cover,
+              ),
             ),
           ],
         ),
       ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: _incrementCounter,
-        tooltip: 'Increment',
-        child: const Icon(Icons.add),
-      ), // This trailing comma makes auto-formatting nicer for build methods.
+    );
+  }
+}
+
+class ProductCard extends StatelessWidget {
+  final Product product;
+  const ProductCard({super.key, required this.product});
+
+  @override
+  Widget build(BuildContext context) {
+    final cs = Theme.of(context).colorScheme;
+
+    return Card(
+      clipBehavior: Clip.antiAlias,
+      child: InkWell(
+        onTap: () => ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('${product.name} (demo)')),
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            // image + badges
+            Expanded(
+              child: Stack(
+                children: [
+                  Positioned.fill(
+                    child: Image.network(product.image, fit: BoxFit.cover),
+                  ),
+                  Positioned(
+                    top: 8,
+                    right: 8,
+                    child: Container(
+                      decoration: BoxDecoration(
+                        color: Colors.black.withOpacity(0.25),
+                        shape: BoxShape.circle,
+                      ),
+                      child: IconButton(
+                        onPressed: () {},
+                        icon: const Icon(Icons.favorite_border),
+                      ),
+                    ),
+                  ),
+                  if (product.onSale)
+                    Positioned(
+                      top: 10,
+                      left: 10,
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                        decoration: BoxDecoration(
+                          color: cs.primary,
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                        child: const Text('Sale',
+                            style: TextStyle(fontWeight: FontWeight.w700)),
+                      ),
+                    ),
+                ],
+              ),
+            ),
+
+            // details
+            Padding(
+              padding: const EdgeInsets.all(12),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(children: [
+                    ...List.generate(
+                      5,
+                      (i) => Icon(
+                        i < product.rating.round()
+                            ? Icons.star
+                            : Icons.star_border,
+                        size: 14,
+                        color: cs.primary,
+                      ),
+                    ),
+                    const SizedBox(width: 6),
+                    Text('(${product.rating.toStringAsFixed(1)})',
+                        style: const TextStyle(fontSize: 12)),
+                  ]),
+                  const SizedBox(height: 6),
+                  Text(product.brand,
+                      style: const TextStyle(fontSize: 12, color: Colors.white70)),
+                  Text(
+                    product.name,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: const TextStyle(fontWeight: FontWeight.w700),
+                  ),
+                  const SizedBox(height: 6),
+                  Row(
+                    children: [
+                      Text('\$${product.price.toStringAsFixed(0)}',
+                          style: const TextStyle(
+                              fontWeight: FontWeight.w700, fontSize: 16)),
+                      if (product.oldPrice != null) ...[
+                        const SizedBox(width: 8),
+                        Text('\$${product.oldPrice!.toStringAsFixed(0)}',
+                            style: const TextStyle(
+                              decoration: TextDecoration.lineThrough,
+                              color: Colors.white60,
+                            )),
+                      ],
+                    ],
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
     );
   }
 }
