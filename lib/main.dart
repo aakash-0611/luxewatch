@@ -59,8 +59,8 @@ class LuxeWatchApp extends StatelessWidget {
 class Product {
   final String id, brand, name, image;
   final double price;
-  final double? oldPrice; // null means no old price
-  final double rating; // 0..5
+  final double? oldPrice; 
+  final double rating; 
   final bool onSale;
   const Product({
     required this.id,
@@ -146,7 +146,7 @@ const List<Product> kProducts = [
   ),
 ];
 
-/* ============================== SHELL =================================== */
+/*  SHELL */
 
 class HomeShell extends StatefulWidget {
   const HomeShell({super.key});
@@ -230,7 +230,7 @@ class _HomeShellState extends State<HomeShell> {
   }
 }
 
-/* ============================== HOME ==================================== */
+/* HOME  */
 
 class LuxeHome extends StatelessWidget {
   final bool isTablet;
@@ -238,7 +238,6 @@ class LuxeHome extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final cs = Theme.of(context).colorScheme;
 
     return CustomScrollView(
       slivers: [
@@ -253,14 +252,13 @@ class LuxeHome extends StatelessWidget {
           ],
         ),
 
-        // Tablet hero (landscape)
-        if (isTablet)
-          SliverToBoxAdapter(
-            child: Padding(
-              padding: const EdgeInsets.all(16),
-              child: _HeroCard(),
-            ),
+        // ✅ ALWAYS show hero (compact on phones, wide on tablets)
+        SliverToBoxAdapter(
+          child: Padding(
+            padding: const EdgeInsets.all(16),
+            child: HeroBanner(isWide: isTablet),
           ),
+        ),
 
         // Categories (chips)
         SliverToBoxAdapter(
@@ -302,6 +300,94 @@ class LuxeHome extends StatelessWidget {
   }
 }
 
+class HeroBanner extends StatelessWidget {
+  final bool isWide; // tablet/desktop = true, phone = false
+  const HeroBanner({super.key, required this.isWide});
+
+  @override
+  Widget build(BuildContext context) {
+    final cs = Theme.of(context).colorScheme;
+
+    // Shared content
+    final title = Text('Good Morning',
+        style: Theme.of(context).textTheme.titleLarge);
+    const subtitle = Text('Discover exquisite timepieces');
+    final tag = Container(
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+      decoration: BoxDecoration(
+        color: cs.primary.withOpacity(0.16),
+        borderRadius: BorderRadius.circular(8),
+      ),
+      child: const Text('New Collection • Heritage Series'),
+    );
+    final cta = FilledButton(
+      onPressed: () {},
+      child: const Text('Explore Collection'),
+    );
+
+    final image = ClipRRect(
+      borderRadius: BorderRadius.circular(12),
+      child: Image.network(
+        'https://picsum.photos/seed/heritage/640/420',
+        height: isWide ? 140 : 120,
+        width: isWide ? 180 : double.infinity,
+        fit: BoxFit.cover,
+      ),
+    );
+
+    // Phone: stacked (image below text)
+    if (!isWide) {
+      return Card(
+        child: Padding(
+          padding: const EdgeInsets.all(16),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              title,
+              const SizedBox(height: 6),
+              subtitle,
+              const SizedBox(height: 10),
+              tag,
+              const SizedBox(height: 12),
+              cta,
+              const SizedBox(height: 12),
+              image,
+            ],
+          ),
+        ),
+      );
+    }
+
+    // Tablet: side-by-side
+    return Card(
+      child: Padding(
+        padding: const EdgeInsets.all(16),
+        child: Row(
+          children: [
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  title,
+                  const SizedBox(height: 6),
+                  subtitle,
+                  const SizedBox(height: 10),
+                  tag,
+                  const SizedBox(height: 12),
+                  cta,
+                ],
+              ),
+            ),
+            const SizedBox(width: 16),
+            image,
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+
 /* ============================ UI WIDGETS ================================= */
 
 class _CategoryChip extends StatelessWidget {
@@ -325,163 +411,154 @@ class _CategoryChip extends StatelessWidget {
   }
 }
 
-class _HeroCard extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    final cs = Theme.of(context).colorScheme;
-    return Card(
-      child: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Row(
-          children: [
-            // text
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text('Good Morning', style: Theme.of(context).textTheme.titleLarge),
-                  const SizedBox(height: 6),
-                  const Text('Discover exquisite timepieces'),
-                  const SizedBox(height: 12),
-                  Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-                    decoration: BoxDecoration(
-                      color: cs.primary.withOpacity(0.16),
-                      borderRadius: BorderRadius.circular(8),
-                    ),
-                    child: const Text('New Collection • Heritage Series'),
-                  ),
-                  const SizedBox(height: 12),
-                  FilledButton(onPressed: () {}, child: const Text('Explore Collection')),
-                ],
-              ),
-            ),
-            const SizedBox(width: 16),
-            // image
-            ClipRRect(
-              borderRadius: BorderRadius.circular(12),
-              child: Image.network(
-                'https://picsum.photos/seed/heritage/420/280',
-                height: 140,
-                width: 180,
-                fit: BoxFit.cover,
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-}
-
 class ProductCard extends StatelessWidget {
   final Product product;
   const ProductCard({super.key, required this.product});
 
   @override
   Widget build(BuildContext context) {
-    final cs = Theme.of(context).colorScheme;
 
     return Card(
-      clipBehavior: Clip.antiAlias,
-      child: InkWell(
-        onTap: () => ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('${product.name} (demo)')),
+  clipBehavior: Clip.antiAlias,
+  child: InkWell(
+    onTap: () {
+      Navigator.of(context).push(
+        PageRouteBuilder(
+          transitionDuration: const Duration(milliseconds: 250),
+          pageBuilder: (_, a, __) =>
+              FadeTransition(opacity: a, child: ProductDetailPage(product: product)),
         ),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            // image + badges
-            Expanded(
-              child: Stack(
-                children: [
-                  Positioned.fill(
-                    child: Image.network(product.image, fit: BoxFit.cover),
-                  ),
-                  Positioned(
-                    top: 8,
-                    right: 8,
-                    child: Container(
-                      decoration: BoxDecoration(
-                        color: Colors.black.withOpacity(0.25),
-                        shape: BoxShape.circle,
-                      ),
-                      child: IconButton(
-                        onPressed: () {},
-                        icon: const Icon(Icons.favorite_border),
-                      ),
-                    ),
-                  ),
-                  if (product.onSale)
-                    Positioned(
-                      top: 10,
-                      left: 10,
-                      child: Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                        decoration: BoxDecoration(
-                          color: cs.primary,
-                          borderRadius: BorderRadius.circular(8),
-                        ),
-                        child: const Text('Sale',
-                            style: TextStyle(fontWeight: FontWeight.w700)),
-                      ),
-                    ),
-                ],
+      );
+    },
+    child: Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Expanded(
+          child: Stack(
+            children: [
+              // HERO wraps the image here:
+              Positioned.fill(
+                child: Hero(
+                  tag: 'pimg-${product.id}',
+                  child: Image.network(product.image, fit: BoxFit.cover),
+                ),
               ),
-            ),
+              Positioned(
+                top: 8,
+                right: 8,
+                child: Container(
+                  decoration: BoxDecoration(
+                    color: Colors.black.withOpacity(0.25),
+                    shape: BoxShape.circle,
+                  ),
+                  child: IconButton(
+                    onPressed: () {},
+                    icon: const Icon(Icons.favorite_border),
+                  ),
+                ),
+              ),
+              if (product.onSale)
+                Positioned(
+                  top: 10,
+                  left: 10,
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                    decoration: BoxDecoration(
+                      color: Theme.of(context).colorScheme.primary,
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    child: const Text('Sale', style: TextStyle(fontWeight: FontWeight.w700)),
+                  ),
+                ),
+            ],
+          ),
+        ),
+      ],
+    ),
+  ),
+);
+}
+}
+class ProductDetailPage extends StatelessWidget {
+  final Product product;
+  const ProductDetailPage({super.key, required this.product});
 
-            // details
-            Padding(
-              padding: const EdgeInsets.all(12),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Row(children: [
-                    ...List.generate(
-                      5,
-                      (i) => Icon(
-                        i < product.rating.round()
-                            ? Icons.star
-                            : Icons.star_border,
-                        size: 14,
-                        color: cs.primary,
-                      ),
-                    ),
-                    const SizedBox(width: 6),
-                    Text('(${product.rating.toStringAsFixed(1)})',
-                        style: const TextStyle(fontSize: 12)),
-                  ]),
-                  const SizedBox(height: 6),
-                  Text(product.brand,
-                      style: const TextStyle(fontSize: 12, color: Colors.white70)),
-                  Text(
-                    product.name,
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                    style: const TextStyle(fontWeight: FontWeight.w700),
-                  ),
-                  const SizedBox(height: 6),
-                  Row(
-                    children: [
-                      Text('\$${product.price.toStringAsFixed(0)}',
-                          style: const TextStyle(
-                              fontWeight: FontWeight.w700, fontSize: 16)),
-                      if (product.oldPrice != null) ...[
-                        const SizedBox(width: 8),
-                        Text('\$${product.oldPrice!.toStringAsFixed(0)}',
-                            style: const TextStyle(
-                              decoration: TextDecoration.lineThrough,
-                              color: Colors.white60,
-                            )),
-                      ],
-                    ],
-                  ),
-                ],
+  @override
+  Widget build(BuildContext context) {
+    final cs = Theme.of(context).colorScheme;
+
+    return Scaffold(
+      appBar: AppBar(title: Text(product.name)),
+      body: ListView(
+        padding: const EdgeInsets.all(16),
+        children: [
+          Hero(
+            tag: 'pimg-${product.id}',
+            child: ClipRRect(
+              borderRadius: BorderRadius.circular(16),
+              child: Image.network(
+                product.image,
+                height: 280,
+                fit: BoxFit.cover,
               ),
             ),
-          ],
-        ),
+          ),
+          const SizedBox(height: 16),
+
+          Text(product.brand, style: TextStyle(color: cs.primary, fontWeight: FontWeight.w600)),
+          const SizedBox(height: 6),
+          Text(product.name, style: Theme.of(context).textTheme.titleLarge),
+
+          const SizedBox(height: 10),
+          Row(
+            children: [
+              ...List.generate(
+                5,
+                (i) => Icon(
+                  i < product.rating.round() ? Icons.star : Icons.star_border,
+                  size: 18, color: cs.primary,
+                ),
+              ),
+              const SizedBox(width: 8),
+              Text('(${product.rating.toStringAsFixed(1)})'),
+            ],
+          ),
+
+          const SizedBox(height: 12),
+          Row(
+            children: [
+              Text('\$${product.price.toStringAsFixed(0)}',
+                  style: const TextStyle(fontSize: 20, fontWeight: FontWeight.w800)),
+              if (product.oldPrice != null) ...[
+                const SizedBox(width: 10),
+                Text('\$${product.oldPrice!.toStringAsFixed(0)}',
+                    style: const TextStyle(
+                      decoration: TextDecoration.lineThrough,
+                      color: Colors.white60,
+                    )),
+              ],
+            ],
+          ),
+
+          const SizedBox(height: 16),
+          const Text(
+            "A refined timepiece crafted with premium materials. "
+            "This is a demo description to satisfy the coursework requirement.",
+          ),
+
+          const SizedBox(height: 20),
+          FilledButton.icon(
+            onPressed: () {
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(content: Text('Demo: Add to cart not implemented')),
+              );
+            },
+            icon: const Icon(Icons.add_shopping_cart),
+            label: const Text('Add to Cart'),
+          ),
+        ],
       ),
     );
   }
 }
+
