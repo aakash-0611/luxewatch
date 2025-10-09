@@ -11,14 +11,55 @@ class LuxeWatchApp extends StatelessWidget {
     final ThemeData light = ThemeData(
       useMaterial3: true,
       colorScheme: ColorScheme.fromSeed(
-        seedColor: const Color(0xFFD4AF37),
+        seedColor: const Color(0xFFD4AF37), // luxe gold
         brightness: Brightness.light,
       ),
+      textTheme: const TextTheme(
+        titleLarge: TextStyle(fontWeight: FontWeight.w800),
+      ),
+      appBarTheme: const AppBarTheme(centerTitle: false),
+      navigationBarTheme: NavigationBarThemeData(
+        backgroundColor: const Color(0xFF0B0F14),
+        indicatorColor: const Color(0xFFD4AF37),
+        labelBehavior: NavigationDestinationLabelBehavior.alwaysShow,
+        iconTheme: WidgetStatePropertyAll(
+          IconThemeData(color: Colors.white70),
+        ),
+        labelTextStyle: WidgetStatePropertyAll(
+          const TextStyle(color: Colors.white70, fontWeight: FontWeight.w600),
+        ),
+      ),
+      chipTheme: ChipThemeData(
+        shape: StadiumBorder(side: BorderSide(color: const Color(0xFF1A1F26))),
+        backgroundColor: const Color(0xFF161B22),
+        selectedColor: const Color(0x33D4AF37),
+        labelStyle: const TextStyle(fontWeight: FontWeight.w600),
+        side: const BorderSide(color: Colors.transparent),
+        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+      ),
+      filledButtonTheme: FilledButtonThemeData(
+        style: ButtonStyle(
+          shape: WidgetStatePropertyAll(
+            RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+          ),
+          padding: const WidgetStatePropertyAll(
+            EdgeInsets.symmetric(horizontal: 18, vertical: 12),
+          ),
+        ),
+      ),
+      outlinedButtonTheme: OutlinedButtonThemeData(
+        style: ButtonStyle(
+          shape: WidgetStatePropertyAll(
+            RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+          ),
+          side: const WidgetStatePropertyAll(BorderSide(color: Color(0xFFD4AF37))),
+        ),
+      ),
       cardTheme: const CardThemeData(
-        color: Colors.white,
-        elevation: 1,
+        color: Color(0xFF11151B),
+        elevation: 0,
         shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.all(Radius.circular(16)),
+          borderRadius: BorderRadius.all(Radius.circular(18)),
         ),
         clipBehavior: Clip.antiAlias,
       ),
@@ -31,16 +72,59 @@ class LuxeWatchApp extends StatelessWidget {
         seedColor: const Color(0xFFD4AF37),
         brightness: Brightness.dark,
       ),
-      scaffoldBackgroundColor: const Color(0xFF0B0F14),
+      scaffoldBackgroundColor: const Color(0xFF0B0F14), // deep charcoal
+      textTheme: const TextTheme(
+        titleLarge: TextStyle(fontWeight: FontWeight.w800),
+      ),
+      appBarTheme: const AppBarTheme(
+        backgroundColor: Color(0xFF0B0F14),
+        centerTitle: false,
+      ),
+      navigationBarTheme: NavigationBarThemeData(
+        backgroundColor: const Color(0xFF0B0F14),
+        indicatorColor: const Color(0xFFD4AF37),
+        labelBehavior: NavigationDestinationLabelBehavior.alwaysShow,
+        iconTheme: const WidgetStatePropertyAll(IconThemeData(color: Colors.white70)),
+        labelTextStyle: const WidgetStatePropertyAll(
+          TextStyle(color: Colors.white70, fontWeight: FontWeight.w600),
+        ),
+      ),
+      chipTheme: ChipThemeData(
+        shape: const StadiumBorder(),
+        backgroundColor: const Color(0xFF161B22),
+        selectedColor: const Color(0x33D4AF37),
+        labelStyle: const TextStyle(fontWeight: FontWeight.w600),
+        side: const BorderSide(color: Colors.transparent),
+        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+      ),
+      filledButtonTheme: FilledButtonThemeData(
+        style: ButtonStyle(
+          shape: WidgetStatePropertyAll(
+            RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+          ),
+          padding: const WidgetStatePropertyAll(
+            EdgeInsets.symmetric(horizontal: 18, vertical: 12),
+          ),
+        ),
+      ),
+      outlinedButtonTheme: OutlinedButtonThemeData(
+        style: ButtonStyle(
+          shape: WidgetStatePropertyAll(
+            RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+          ),
+          side: const WidgetStatePropertyAll(BorderSide(color: Color(0xFFD4AF37))),
+        ),
+      ),
       cardTheme: const CardThemeData(
-        color: Color(0xFF12161C),
-        elevation: 1,
+        color: Color(0xFF11151B),
+        elevation: 0,
         shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.all(Radius.circular(16)),
+          borderRadius: BorderRadius.all(Radius.circular(18)),
         ),
         clipBehavior: Clip.antiAlias,
       ),
     );
+
 
     return MaterialApp(
       debugShowCheckedModeBanner: false,
@@ -95,7 +179,7 @@ const List<Product> kProducts = [
     id: 'p3',
     brand: 'Patek Philippe',
     name: 'Calatrava Heritage',
-    image: 'assets/images/patek_aquanaut.avif',
+    image: 'assets/images/patek_aquanaut.avif', // consider .jpg/.png
     price: 32000,
     rating: 4.9,
   ),
@@ -113,7 +197,7 @@ const List<Product> kProducts = [
     id: 'p5',
     brand: 'Rolex',
     name: 'Day-Date Platinum',
-    image: 'assets/images/rolex_datejust.avif',
+    image: 'assets/images/rolex_datejust.avif', // consider .jpg/.png
     price: 54000,
     rating: 4.9,
   ),
@@ -121,7 +205,7 @@ const List<Product> kProducts = [
     id: 'p6',
     brand: 'Cartier',
     name: 'Santos De Cartier',
-    image: 'assets/images/cartier_santos.avif',
+    image: 'assets/images/cartier_santos.avif', // consider .jpg/.png
     price: 7800,
     oldPrice: 9200,
     rating: 4.5,
@@ -144,6 +228,7 @@ const List<Product> kProducts = [
     rating: 4.2,
   ),
 ];
+
 // ---- Image helper: uses assets if path starts with 'assets/', else network ----
 Widget productImage(
   String path, {
@@ -152,6 +237,9 @@ Widget productImage(
   double? width,
   BorderRadius? radius,
 }) {
+  final int ix = path.indexOf('assets/');
+  if (ix >= 0) path = path.substring(ix);
+
   final Widget img = path.startsWith('assets/')
       ? Image.asset(path, fit: fit, height: height, width: width)
       : Image.network(path, fit: fit, height: height, width: width);
@@ -169,15 +257,18 @@ class HomeShell extends StatefulWidget {
 class _HomeShellState extends State<HomeShell> {
   int _index = 0;
 
-  void _soon() => ScaffoldMessenger.of(context)
-      .showSnackBar(const SnackBar(content: Text('Coming soon (demo)')));
-
   Widget _body(bool isTablet) {
     switch (_index) {
       case 0:
         return LuxeHome(isTablet: isTablet);
       case 1:
-        return const SearchPage(); // NEW: Search page
+        return const SearchPage();
+      case 2:
+        return const WishlistPage(); // static wishlist with red buttons
+      case 3:
+        return const ProductsPage(); // full grid
+      case 4:
+        return const CartPage(); // NEW: cart example
       default:
         return LuxeHome(isTablet: isTablet);
     }
@@ -195,19 +286,13 @@ class _HomeShellState extends State<HomeShell> {
             body: _body(isTablet),
             bottomNavigationBar: NavigationBar(
               selectedIndex: _index,
-              onDestinationSelected: (i) {
-                setState(() => _index = i);
-                if (i >= 2) _soon(); // Wishlist/Cart/Profile
-              },
+              onDestinationSelected: (i) => setState(() => _index = i),
               destinations: const [
                 NavigationDestination(icon: Icon(Icons.home), label: 'Home'),
                 NavigationDestination(icon: Icon(Icons.search), label: 'Search'),
-                NavigationDestination(
-                    icon: Icon(Icons.favorite_border), label: 'Wishlist'),
-                NavigationDestination(
-                    icon: Icon(Icons.shopping_cart_outlined), label: 'Cart'),
-                NavigationDestination(
-                    icon: Icon(Icons.person_outline), label: 'Profile'),
+                NavigationDestination(icon: Icon(Icons.favorite_border), label: 'Wishlist'),
+                NavigationDestination(icon: Icon(Icons.storefront), label: 'Products'),
+                NavigationDestination(icon: Icon(Icons.shopping_cart_outlined), label: 'Cart'),
               ],
             ),
           );
@@ -219,10 +304,7 @@ class _HomeShellState extends State<HomeShell> {
             children: [
               NavigationRail(
                 selectedIndex: _index,
-                onDestinationSelected: (i) {
-                  setState(() => _index = i);
-                  if (i >= 2) _soon();
-                },
+                onDestinationSelected: (i) => setState(() => _index = i),
                 extended: true,
                 leading: Padding(
                   padding: const EdgeInsets.all(8),
@@ -237,14 +319,10 @@ class _HomeShellState extends State<HomeShell> {
                     selectedIcon: Icon(Icons.home),
                     label: Text('Home'),
                   ),
-                  NavigationRailDestination(
-                      icon: Icon(Icons.search), label: Text('Search')),
-                  NavigationRailDestination(
-                      icon: Icon(Icons.favorite_border), label: Text('Wishlist')),
-                  NavigationRailDestination(
-                      icon: Icon(Icons.shopping_cart_outlined), label: Text('Cart')),
-                  NavigationRailDestination(
-                      icon: Icon(Icons.person_outline), label: Text('Profile')),
+                  NavigationRailDestination(icon: Icon(Icons.search), label: Text('Search')),
+                  NavigationRailDestination(icon: Icon(Icons.favorite_border), label: Text('Wishlist')),
+                  NavigationRailDestination(icon: Icon(Icons.storefront), label: Text('Products')),
+                  NavigationRailDestination(icon: Icon(Icons.shopping_cart_outlined), label: Text('Cart')),
                 ],
               ),
               const VerticalDivider(width: 1),
@@ -269,19 +347,28 @@ class LuxeHome extends StatelessWidget {
 
     return CustomScrollView(
       slivers: [
-        // Small, clean top app bar per Android guidelines
-        SliverAppBar(
-          pinned: true,
-          title: const Text('LuxeWatch'),
-          actions: const [
-            Padding(
-              padding: EdgeInsets.only(right: 12),
-              child: CircleAvatar(radius: 16, child: Text('JD')),
+        // Header row: "Good Morning" + avatar menu (Material 3)
+        SliverToBoxAdapter(
+          child: Padding(
+            padding: const EdgeInsets.fromLTRB(16, 12, 16, 8),
+            child: Row(
+              children: [
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: const [
+                      Text('Hey There!,', style: TextStyle(fontSize: 24, fontWeight: FontWeight.w900)),
+                      SizedBox(height: 4),
+                    ],
+                  ),
+                ),
+                // little avatar with menu
+                buildUserMenuAction(context),
+              ],
             ),
-          ],
+          ),
         ),
-
-        // Explore header + chips (Material action chips)
+        // Explore header + chips
         SliverToBoxAdapter(
           child: Padding(
             padding: const EdgeInsets.fromLTRB(16, 12, 16, 4),
@@ -296,7 +383,7 @@ class LuxeHome extends StatelessWidget {
           ),
         ),
 
-        // Promo banner with image + overlay text CTA
+        // Promo banner
         SliverToBoxAdapter(
           child: Padding(
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
@@ -323,7 +410,7 @@ class LuxeHome extends StatelessWidget {
           ),
         ),
 
-        // Nice finishing section (kept from before)
+        // Our Promise
         const SliverToBoxAdapter(
           child: Padding(
             padding: EdgeInsets.all(16),
@@ -336,6 +423,40 @@ class LuxeHome extends StatelessWidget {
   }
 }
 
+/* ============================= REUSABLES ================================= */
+
+enum _MenuItem { account, privacy, settings, help, signout }
+
+PopupMenuButton _menu({required BuildContext context}) => PopupMenuButton<_MenuItem>(
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+      onSelected: (m) {
+        final text = switch (m) {
+          _MenuItem.account => 'Account',
+          _MenuItem.privacy => 'Privacy',
+          _MenuItem.settings => 'Settings',
+          _MenuItem.help => 'Help & Support',
+          _MenuItem.signout => 'Sign out',
+        };
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('$text (demo)')));
+      },
+      itemBuilder: (ctx) => const [
+        PopupMenuItem(value: _MenuItem.account, child: Text('Account')),
+        PopupMenuItem(value: _MenuItem.privacy, child: Text('Privacy')),
+        PopupMenuItem(value: _MenuItem.settings, child: Text('Settings')),
+        PopupMenuItem(value: _MenuItem.help, child: Text('Help & Support')),
+        PopupMenuItem(value: _MenuItem.signout, child: Text('Sign out')),
+      ],
+      child: Padding(
+        padding: const EdgeInsets.only(right: 12),
+        child: CircleAvatar(
+          radius: 16,
+          child: Text('W', style: TextStyle(color: Theme.of(context).colorScheme.onPrimary)),
+        ),
+      ),
+    );
+
+Widget buildUserMenuAction(BuildContext context) => _menu(context: context);
+
 class SectionTitle extends StatelessWidget {
   final String title;
   const SectionTitle({super.key, required this.title});
@@ -344,10 +465,7 @@ class SectionTitle extends StatelessWidget {
   Widget build(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.fromLTRB(16, 8, 16, 8),
-      child: Text(
-        title,
-        style: Theme.of(context).textTheme.titleLarge,
-      ),
+      child: Text(title, style: Theme.of(context).textTheme.titleLarge),
     );
   }
 }
@@ -356,35 +474,15 @@ class OurPromiseCard extends StatelessWidget {
   const OurPromiseCard({super.key});
   @override
   Widget build(BuildContext context) {
-    final cs = Theme.of(context).colorScheme;
     return Card(
       child: Padding(
         padding: const EdgeInsets.all(16),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text('Our Promise', style: Theme.of(context).textTheme.titleLarge),
-            const SizedBox(height: 8),
-            const Text('Craftsmanship • Authenticity • Care'),
-            const SizedBox(height: 12),
-            Row(
-              children: [
-                _IconLine(icon: Icons.verified, label: '2-Year Warranty'),
-                const SizedBox(width: 12),
-                _IconLine(icon: Icons.local_shipping_outlined, label: 'Free Shipping'),
-                const SizedBox(width: 12),
-                _IconLine(icon: Icons.build_outlined, label: 'Lifetime Service'),
-              ],
-            ),
-            const SizedBox(height: 12),
-            FilledButton(
-              onPressed: () {},
-              style: ButtonStyle(
-                backgroundColor: WidgetStatePropertyAll(cs.primary.withOpacity(0.16)),
-                foregroundColor: WidgetStatePropertyAll(cs.onSurface)
-              ),
-              child: const Text('Learn more'),
-            ),
+          children: const [
+            Text('Our Promise', style: TextStyle(fontSize: 20, fontWeight: FontWeight.w700)),
+            SizedBox(height: 8),
+            Text('Craftsmanship • Authenticity • Care'),
           ],
         ),
       ),
@@ -392,23 +490,7 @@ class OurPromiseCard extends StatelessWidget {
   }
 }
 
-class _IconLine extends StatelessWidget {
-  final IconData icon;
-  final String label;
-  const _IconLine({required this.icon, required this.label});
-  @override
-  Widget build(BuildContext context) {
-    return Expanded(
-      child: Row(
-        children: [
-          Icon(icon, size: 18),
-          const SizedBox(width: 6),
-          Flexible(child: Text(label, overflow: TextOverflow.ellipsis)),
-        ],
-      ),
-    );
-    }
-}
+/* ============================= HOME EXTRAS =============================== */
 
 class ExploreChipsSection extends StatelessWidget {
   const ExploreChipsSection({super.key});
@@ -416,33 +498,37 @@ class ExploreChipsSection extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final cs = Theme.of(context).colorScheme;
-
-    // Helper to build a standard action chip per Material 3
-    Widget chip(IconData icon, String label, VoidCallback onTap) {
+    Widget chip(IconData icon, String label) {
       return Padding(
         padding: const EdgeInsets.only(right: 8, bottom: 8),
-        child: ActionChip.elevated(
-          avatar: Icon(icon, size: 18),
-          label: Text(label),
-          onPressed: onTap,
-          elevation: 0,
-          backgroundColor: cs.surfaceContainerLowest,
+        child: FilterChip(
+          showCheckmark: false,
+          label: Row(children: [
+            Icon(icon, size: 16, color: Colors.white),
+            const SizedBox(width: 6),
+            Text(label, style: const TextStyle(fontWeight: FontWeight.w600)),
+          ]),
+          selected: label == 'All',
+          onSelected: (_) {},
+          selectedColor: cs.primary.withOpacity(0.22),
+          backgroundColor: const Color(0xFF161B22),
         ),
       );
     }
 
-    // Use Wrap for automatic wrapping on small screens
     return Wrap(
       children: [
-        chip(Icons.star_rate_rounded, 'Best Sellers', () {}),
-        chip(Icons.watch_rounded, 'New Arrivals', () {}),
-        chip(Icons.diamond_outlined, 'Limited', () {}),
-        chip(Icons.swipe_rounded, 'Dress', () {}),
-        chip(Icons.fitness_center_rounded, 'Sports', () {}),
+        chip(Icons.all_inclusive, 'All'),
+        chip(Icons.sports_score, 'Sports'),
+        chip(Icons.checkroom, 'Dress'),
+        chip(Icons.history_edu, 'Vintage'),
+        chip(Icons.workspace_premium, 'Limited'),
       ],
     );
   }
 }
+
+
 class PromoBanner extends StatelessWidget {
   final bool isWide;
   const PromoBanner({super.key, required this.isWide});
@@ -451,182 +537,52 @@ class PromoBanner extends StatelessWidget {
   Widget build(BuildContext context) {
     final cs = Theme.of(context).colorScheme;
 
-    final image = ClipRRect(
-      borderRadius: BorderRadius.circular(16),
-      child: Stack(
-        children: [
-          // Replace with your own asset later if you want
-          Image.network(
-            'https://picsum.photos/seed/luxe_banner/1200/700',
-            height: isWide ? 220 : 180,
-            width: double.infinity,
-            fit: BoxFit.cover,
-          ),
-          // Gradient for legible text
-          Positioned.fill(
-            child: DecoratedBox(
-              decoration: BoxDecoration(
-                gradient: LinearGradient(
-                  begin: Alignment.bottomCenter,
-                  end: Alignment.topCenter,
-                  colors: [
-                    Colors.black.withOpacity(0.55),
-                    Colors.transparent,
-                  ],
-                ),
-              ),
-            ),
-          ),
-          // Text overlay
-          Positioned(
-            left: 16,
-            right: 16,
-            bottom: 16,
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  'Get custom recs for your next timepiece',
-                  style: const TextStyle(
-                    fontSize: 18,
-                    fontWeight: FontWeight.w900,
-                    color: Colors.white,
-                  ),
-                ),
-                const SizedBox(height: 6),
-                const Text(
-                  'Curated picks based on what you like.',
-                  style: TextStyle(color: Colors.white70),
-                ),
-                const SizedBox(height: 10),
-                FilledButton.tonal(
-                  style: ButtonStyle(
-                    backgroundColor: WidgetStatePropertyAll(
-                      cs.primary.withOpacity(0.25),
-                    ),
-                  ),
-                  onPressed: () {},
-                  child: const Text('Explore Collection'),
-                ),
-              ],
-            ),
-          ),
-        ],
-      ),
-    );
-
-    return image;
-  }
-}
-
-/* ============================== SEARCH ================================== */
-
-class SearchPage extends StatelessWidget {
-  const SearchPage({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    // Simple “search results” list (no actual filtering required yet)
-    return Column(
-      children: [
-        const SizedBox(height: 8),
-        Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 16),
-          child: TextField(
-            decoration: InputDecoration(
-              hintText: 'Search watches',
-              prefixIcon: const Icon(Icons.search),
-              border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
-            ),
-            onChanged: (q) {
-              // optional: wire up filtering later
-            },
-          ),
-        ),
-        const SizedBox(height: 8),
-        const Divider(height: 1),
-        Expanded(
-          child: ListView.separated(
-            itemCount: kProducts.length,
-            separatorBuilder: (_, __) => const Divider(height: 1),
-            itemBuilder: (context, i) {
-              final p = kProducts[i];
-              return ListTile(
-                leading: ClipRRect(
-                  borderRadius: BorderRadius.circular(8),
-                  child: productImage(p.image, width: 56, height: 56, fit: BoxFit.cover),
-                ),
-                title: Text(p.name, maxLines: 1, overflow: TextOverflow.ellipsis),
-                subtitle: Text('${p.brand} • \$${p.price.toStringAsFixed(0)}'),
-                trailing: const Icon(Icons.chevron_right),
-                onTap: () {
-                  Navigator.of(context).push(
-                    MaterialPageRoute(builder: (_) => ProductDetailPage(product: p)),
-                  );
-                },
-              );
-            },
-          ),
-        ),
-      ],
-    );
-  }
-}
-
-/* ============================ HERO BANNER ================================ */
-
-class HeroBanner extends StatelessWidget {
-  final bool isWide; // tablet/desktop = true, phone = false
-  const HeroBanner({super.key, required this.isWide});
-
-  @override
-  Widget build(BuildContext context) {
-    final cs = Theme.of(context).colorScheme;
-
-    final title =
-        Text('Good Morning', style: Theme.of(context).textTheme.titleLarge);
-    const subtitle = Text('Discover exquisite timepieces');
-    final tag = Container(
-      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+    // shared pill tag
+    Widget goldTag(String text) => Container(
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
       decoration: BoxDecoration(
-        color: cs.primary.withOpacity(0.16),
-        borderRadius: BorderRadius.circular(8),
+        color: cs.primary.withOpacity(0.20),
+        borderRadius: BorderRadius.circular(24),
       ),
-      child: const Text('New Collection • Heritage Series'),
+      child: Text(text, style: const TextStyle(fontWeight: FontWeight.w800)),
     );
-    final cta = FilledButton(onPressed: () {}, child: const Text('Explore Collection'));
-    final image = ClipRRect(
-      borderRadius: BorderRadius.circular(12),
-      child: Image.network(
-        'https://picsum.photos/seed/heritage/640/420',
+
+    // image thumb
+    final img = ClipRRect(
+      borderRadius: BorderRadius.circular(14),
+      child: productImage(
+        'assets/images/banner.webp', // or keep your network pic
         height: isWide ? 140 : 120,
-        width: isWide ? 180 : double.infinity,
+        width: isWide ? 160 : double.infinity,
         fit: BoxFit.cover,
       ),
     );
 
     if (!isWide) {
+      // phone: stacked
       return Card(
         child: Padding(
           padding: const EdgeInsets.all(16),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              title,
-              const SizedBox(height: 6),
-              subtitle,
+              goldTag('New Collection'),
               const SizedBox(height: 10),
-              tag,
+              const Text('Heritage Series', style: TextStyle(fontSize: 18, fontWeight: FontWeight.w800)),
+              const SizedBox(height: 4),
+              const Text('Timeless craftsmanship meets modern innovation',
+                  style: TextStyle(color: Colors.white70)),
               const SizedBox(height: 12),
-              cta,
-              const SizedBox(height: 12),
-              image,
+              FilledButton.tonal(onPressed: () {}, child: const Text('Explore Collection')),
+              const SizedBox(height: 14),
+              img,
             ],
           ),
         ),
       );
     }
 
+    // tablet: side-by-side
     return Card(
       child: Padding(
         padding: const EdgeInsets.all(16),
@@ -636,20 +592,339 @@ class HeroBanner extends StatelessWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  title,
-                  const SizedBox(height: 6),
-                  subtitle,
+                  goldTag('New Collection'),
                   const SizedBox(height: 10),
-                  tag,
+                  const Text('Heritage Series', style: TextStyle(fontSize: 20, fontWeight: FontWeight.w800)),
+                  const SizedBox(height: 6),
+                  const Text('Timeless craftsmanship meets modern innovation',
+                      style: TextStyle(color: Colors.white70)),
                   const SizedBox(height: 12),
-                  cta,
+                  FilledButton.tonal(onPressed: () {}, child: const Text('Explore Collection')),
                 ],
               ),
             ),
             const SizedBox(width: 16),
-            image,
+            img,
           ],
         ),
+      ),
+    );
+  }
+}
+
+
+/* ============================== SEARCH ================================== */
+
+class SearchPage extends StatelessWidget {
+  const SearchPage({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return CustomScrollView(
+      slivers: [
+        SliverAppBar(pinned: true, title: const Text('Search'), actions: [buildUserMenuAction(context)]),
+        SliverToBoxAdapter(
+          child: Padding(
+            padding: const EdgeInsets.all(16),
+            child: TextField(
+              decoration: InputDecoration(
+                hintText: 'Search watches',
+                prefixIcon: const Icon(Icons.search),
+                border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+              ),
+            ),
+          ),
+        ),
+        SliverList(
+          delegate: SliverChildBuilderDelegate(
+            (context, i) {
+              final p = kProducts[i];
+              return Column(
+                children: [
+                  ListTile(
+                    leading: ClipRRect(
+                      borderRadius: BorderRadius.circular(8),
+                      child: productImage(p.image, width: 56, height: 56, fit: BoxFit.cover),
+                    ),
+                    title: Text(p.name, maxLines: 1, overflow: TextOverflow.ellipsis),
+                    subtitle: Text('${p.brand} • \$${p.price.toStringAsFixed(0)}'),
+                    trailing: const Icon(Icons.chevron_right),
+                    onTap: () => Navigator.of(context).push(
+                      MaterialPageRoute(builder: (_) => ProductDetailPage(product: p)),
+                    ),
+                  ),
+                  const Divider(height: 1),
+                ],
+              );
+            },
+            childCount: kProducts.length,
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+/* ============================== WISHLIST ================================= */
+
+class WishlistPage extends StatelessWidget {
+  const WishlistPage({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    final items = kProducts.take(3).toList(); // static sample
+
+    return CustomScrollView(
+      slivers: [
+        SliverAppBar(pinned: true, title: const Text('Wishlist'), actions: [buildUserMenuAction(context)]),
+        SliverList(
+          delegate: SliverChildBuilderDelegate(
+            (context, i) {
+              final p = items[i];
+              return Column(
+                children: [
+                  _WishlistItem(product: p),
+                  const Divider(height: 1),
+                ],
+              );
+            },
+            childCount: items.length,
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+class _WishlistItem extends StatelessWidget {
+  final Product product;
+  const _WishlistItem({required this.product});
+
+  @override
+  Widget build(BuildContext context) {
+    // Red actions (static)
+    return Padding(
+      padding: const EdgeInsets.all(12),
+      child: Row(
+        children: [
+          ClipRRect(
+            borderRadius: BorderRadius.circular(12),
+            child: productImage(product.image, width: 84, height: 84, fit: BoxFit.cover),
+          ),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(product.name, style: const TextStyle(fontWeight: FontWeight.w700)),
+                const SizedBox(height: 4),
+                Text(product.brand, style: const TextStyle(color: Colors.white70, fontSize: 12)),
+                const SizedBox(height: 6),
+                Text('\$${product.price.toStringAsFixed(0)}',
+                    style: const TextStyle(fontWeight: FontWeight.bold)),
+                const SizedBox(height: 8),
+                Row(
+                  children: [
+                    FilledButton(
+                      onPressed: () {},
+                      style: const ButtonStyle(
+                        backgroundColor: MaterialStatePropertyAll(Colors.red),
+                        foregroundColor: MaterialStatePropertyAll(Colors.white),
+                      ),
+                      child: const Text('Add to Cart'),
+                    ),
+                    const SizedBox(width: 8),
+                    OutlinedButton(
+                      onPressed: () {},
+                      style: const ButtonStyle(
+                        foregroundColor: MaterialStatePropertyAll(Colors.red),
+                        side: MaterialStatePropertyAll(BorderSide(color: Colors.red)),
+                      ),
+                      child: const Text('Remove'),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+/* ============================== PRODUCTS ================================= */
+
+class ProductsPage extends StatelessWidget {
+  const ProductsPage({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    final isWide = MediaQuery.of(context).size.width >= 900;
+
+    return CustomScrollView(
+      slivers: [
+        SliverAppBar(pinned: true, title: const Text('Products'), actions: [buildUserMenuAction(context)]),
+        SliverPadding(
+          padding: const EdgeInsets.all(12),
+          sliver: SliverGrid(
+            delegate: SliverChildBuilderDelegate(
+              (context, i) => ProductCard(product: kProducts[i]),
+              childCount: kProducts.length,
+            ),
+            gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+              crossAxisCount: isWide ? 4 : 2,
+              crossAxisSpacing: 12,
+              mainAxisSpacing: 12,
+              childAspectRatio: 0.74,
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+/* ================================= CART ================================== */
+
+class CartItem {
+  final Product product;
+  final int qty;
+  const CartItem({required this.product, required this.qty});
+}
+
+class CartPage extends StatelessWidget {
+  const CartPage({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    // Example items (static for demo)
+    final items = <CartItem>[
+      CartItem(product: kProducts[0], qty: 1),
+      CartItem(product: kProducts[3], qty: 2),
+      CartItem(product: kProducts[7], qty: 1),
+    ];
+    final subtotal = items.fold<double>(0, (s, it) => s + it.product.price * it.qty);
+
+    return CustomScrollView(
+      slivers: [
+        SliverAppBar(pinned: true, title: const Text('Cart'), actions: [buildUserMenuAction(context)]),
+
+        // Rows of products
+        SliverToBoxAdapter(
+          child: Padding(
+            padding: const EdgeInsets.all(12),
+            child: Column(
+              children: [
+                // header row
+                _CartHeaderRow(),
+                const Divider(height: 1),
+                // item rows
+                ...items.map((it) => _CartRow(item: it)),
+                const Divider(height: 1),
+                const SizedBox(height: 12),
+
+                // Summary + Checkout
+                Align(
+                  alignment: Alignment.centerRight,
+                  child: ConstrainedBox(
+                    constraints: const BoxConstraints(maxWidth: 420),
+                    child: Card(
+                      child: Padding(
+                        padding: const EdgeInsets.all(16),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.stretch,
+                          children: [
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                const Text('Subtotal', style: TextStyle(fontWeight: FontWeight.w600)),
+                                Text('\$${subtotal.toStringAsFixed(0)}',
+                                    style: const TextStyle(fontWeight: FontWeight.w800)),
+                              ],
+                            ),
+                            const SizedBox(height: 8),
+                            const Text('Taxes and shipping are calculated at checkout.',
+                                style: TextStyle(fontSize: 12, color: Colors.white60)),
+                            const SizedBox(height: 12),
+                            FilledButton(
+                              onPressed: () {},
+                              child: const Text('Checkout'),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+class _CartHeaderRow extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 4),
+      child: Row(
+        children: const [
+          Expanded(flex: 5, child: Text('Product', style: TextStyle(fontWeight: FontWeight.w700))),
+          Expanded(flex: 2, child: Text('Price', textAlign: TextAlign.right)),
+          Expanded(flex: 2, child: Text('Qty', textAlign: TextAlign.center)),
+          Expanded(flex: 2, child: Text('Total', textAlign: TextAlign.right)),
+        ],
+      ),
+    );
+  }
+}
+
+class _CartRow extends StatelessWidget {
+  final CartItem item;
+  const _CartRow({required this.item});
+
+  @override
+  Widget build(BuildContext context) {
+    final p = item.product;
+    final total = p.price * item.qty;
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 4),
+      child: Row(
+        children: [
+          // product cell
+          Expanded(
+            flex: 5,
+            child: Row(
+              children: [
+                ClipRRect(
+                  borderRadius: BorderRadius.circular(12),
+                  child: productImage(p.image, width: 64, height: 64, fit: BoxFit.cover),
+                ),
+                const SizedBox(width: 10),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(p.name, maxLines: 1, overflow: TextOverflow.ellipsis,
+                          style: const TextStyle(fontWeight: FontWeight.w700)),
+                      Text(p.brand, style: const TextStyle(fontSize: 12, color: Colors.white70)),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          ),
+          // price
+          Expanded(flex: 2, child: Text('\$${p.price.toStringAsFixed(0)}', textAlign: TextAlign.right)),
+          // qty (static)
+          const Expanded(flex: 2, child: Text('1–2', textAlign: TextAlign.center)),
+          // total
+          Expanded(flex: 2, child: Text('\$${total.toStringAsFixed(0)}', textAlign: TextAlign.right)),
+        ],
       ),
     );
   }
@@ -695,10 +970,7 @@ class ProductCard extends StatelessWidget {
                         color: Colors.black.withOpacity(0.25),
                         shape: BoxShape.circle,
                       ),
-                      child: IconButton(
-                        onPressed: () {},
-                        icon: const Icon(Icons.favorite_border),
-                      ),
+                      child: IconButton(onPressed: () {}, icon: const Icon(Icons.favorite_border)),
                     ),
                   ),
                   if (product.onSale)
@@ -711,8 +983,7 @@ class ProductCard extends StatelessWidget {
                           color: Theme.of(context).colorScheme.primary,
                           borderRadius: BorderRadius.circular(8),
                         ),
-                        child: const Text('Sale',
-                            style: TextStyle(fontWeight: FontWeight.w700)),
+                        child: const Text('Sale', style: TextStyle(fontWeight: FontWeight.w700)),
                       ),
                     ),
                 ],
@@ -727,39 +998,28 @@ class ProductCard extends StatelessWidget {
                     ...List.generate(
                       5,
                       (i) => Icon(
-                        i < product.rating.round()
-                            ? Icons.star
-                            : Icons.star_border,
+                        i < product.rating.round() ? Icons.star : Icons.star_border,
                         size: 14,
                         color: Theme.of(context).colorScheme.primary,
                       ),
                     ),
                     const SizedBox(width: 6),
-                    Text('(${product.rating.toStringAsFixed(1)})',
-                        style: const TextStyle(fontSize: 12)),
+                    Text('(${product.rating.toStringAsFixed(1)})', style: const TextStyle(fontSize: 12)),
                   ]),
                   const SizedBox(height: 6),
-                  Text(product.brand,
-                      style: const TextStyle(fontSize: 12, color: Colors.white70)),
-                  Text(
-                    product.name,
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                    style: const TextStyle(fontWeight: FontWeight.w700),
-                  ),
+                  Text(product.brand, style: const TextStyle(fontSize: 12, color: Colors.white70)),
+                  Text(product.name,
+                      maxLines: 1, overflow: TextOverflow.ellipsis, style: const TextStyle(fontWeight: FontWeight.w700)),
                   const SizedBox(height: 6),
                   Row(
                     children: [
                       Text('\$${product.price.toStringAsFixed(0)}',
-                          style: const TextStyle(
-                              fontWeight: FontWeight.w700, fontSize: 16)),
+                          style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 16)),
                       if (product.oldPrice != null) ...[
                         const SizedBox(width: 8),
                         Text('\$${product.oldPrice!.toStringAsFixed(0)}',
-                            style: const TextStyle(
-                              decoration: TextDecoration.lineThrough,
-                              color: Colors.white60,
-                            )),
+                            style:
+                                const TextStyle(decoration: TextDecoration.lineThrough, color: Colors.white60)),
                       ],
                     ],
                   ),
@@ -784,7 +1044,7 @@ class ProductDetailPage extends StatelessWidget {
     final cs = Theme.of(context).colorScheme;
 
     return Scaffold(
-      appBar: AppBar(title: Text(product.name)),
+      appBar: AppBar(title: Text(product.name), actions: [buildUserMenuAction(context)]),
       body: ListView(
         padding: const EdgeInsets.all(16),
         children: [
@@ -798,8 +1058,7 @@ class ProductDetailPage extends StatelessWidget {
             ),
           ),
           const SizedBox(height: 16),
-          Text(product.brand,
-              style: TextStyle(color: cs.primary, fontWeight: FontWeight.w600)),
+          Text(product.brand, style: TextStyle(color: cs.primary, fontWeight: FontWeight.w600)),
           const SizedBox(height: 6),
           Text(product.name, style: Theme.of(context).textTheme.titleLarge),
           const SizedBox(height: 10),
@@ -825,10 +1084,7 @@ class ProductDetailPage extends StatelessWidget {
               if (product.oldPrice != null) ...[
                 const SizedBox(width: 10),
                 Text('\$${product.oldPrice!.toStringAsFixed(0)}',
-                    style: const TextStyle(
-                      decoration: TextDecoration.lineThrough,
-                      color: Colors.white60,
-                    )),
+                    style: const TextStyle(decoration: TextDecoration.lineThrough, color: Colors.white60)),
               ],
             ],
           ),
@@ -840,9 +1096,8 @@ class ProductDetailPage extends StatelessWidget {
           const SizedBox(height: 20),
           FilledButton.icon(
             onPressed: () {
-              ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(content: Text('Demo: Add to cart not implemented')),
-              );
+              ScaffoldMessenger.of(context)
+                  .showSnackBar(const SnackBar(content: Text('Demo: Add to cart not implemented')));
             },
             icon: const Icon(Icons.add_shopping_cart),
             label: const Text('Add to Cart'),
