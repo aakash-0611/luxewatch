@@ -7,7 +7,7 @@ class LuxeWatchApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // LIGHT THEME
+    // ---- LIGHT THEME ----
     final ThemeData light = ThemeData(
       useMaterial3: true,
       colorScheme: ColorScheme.fromSeed(
@@ -24,7 +24,7 @@ class LuxeWatchApp extends StatelessWidget {
       ),
     );
 
-    //  DARK THEME
+    // ---- DARK THEME ----
     final ThemeData dark = ThemeData(
       useMaterial3: true,
       colorScheme: ColorScheme.fromSeed(
@@ -42,25 +42,24 @@ class LuxeWatchApp extends StatelessWidget {
       ),
     );
 
-
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       title: 'LuxeWatch',
       theme: light,
       darkTheme: dark,
-      themeMode: ThemeMode.system, // follows device setting
+      themeMode: ThemeMode.system,
       home: const HomeShell(),
     );
   }
 }
 
-/* DATA */
+/* =============================== DATA ================================== */
 
 class Product {
   final String id, brand, name, image;
   final double price;
-  final double? oldPrice; 
-  final double rating; 
+  final double? oldPrice;
+  final double rating;
   final bool onSale;
   const Product({
     required this.id,
@@ -79,7 +78,7 @@ const List<Product> kProducts = [
     id: 'p1',
     brand: 'Audemars Piguet',
     name: 'Royal Oak Classic',
-    image: 'https://picsum.photos/seed/aw1/800/800',
+    image: 'assets/images/ap_ro.png',
     price: 25000,
     oldPrice: 28000,
     rating: 4.8,
@@ -87,8 +86,8 @@ const List<Product> kProducts = [
   Product(
     id: 'p2',
     brand: 'Omega',
-    name: 'Speedmaster Gold',
-    image: 'https://picsum.photos/seed/aw2/800/800',
+    name: 'SeaMaster Gold',
+    image: 'assets/images/omega_seamaster.png',
     price: 18500,
     rating: 4.6,
   ),
@@ -96,7 +95,7 @@ const List<Product> kProducts = [
     id: 'p3',
     brand: 'Patek Philippe',
     name: 'Calatrava Heritage',
-    image: 'https://picsum.photos/seed/aw3/800/800',
+    image: 'assets/images/patek_aquanaut.avif',
     price: 32000,
     rating: 4.9,
   ),
@@ -104,7 +103,7 @@ const List<Product> kProducts = [
     id: 'p4',
     brand: 'Omega',
     name: 'Constellation Elite',
-    image: 'https://picsum.photos/seed/aw4/800/800',
+    image: 'assets/images/omega_seamaster.png',
     price: 22000,
     oldPrice: 26000,
     rating: 4.7,
@@ -114,7 +113,7 @@ const List<Product> kProducts = [
     id: 'p5',
     brand: 'Rolex',
     name: 'Day-Date Platinum',
-    image: 'https://picsum.photos/seed/aw5/800/800',
+    image: 'assets/images/rolex_datejust.avif',
     price: 54000,
     rating: 4.9,
   ),
@@ -122,7 +121,7 @@ const List<Product> kProducts = [
     id: 'p6',
     brand: 'Cartier',
     name: 'Santos De Cartier',
-    image: 'https://picsum.photos/seed/aw6/800/800',
+    image: 'assets/images/cartier_santos.avif',
     price: 7800,
     oldPrice: 9200,
     rating: 4.5,
@@ -132,21 +131,34 @@ const List<Product> kProducts = [
     id: 'p7',
     brand: 'TAG Heuer',
     name: 'Carrera Sport',
-    image: 'https://picsum.photos/seed/aw7/800/800',
+    image: 'assets/images/tag_carrera.png',
     price: 5600,
     rating: 4.4,
   ),
   Product(
     id: 'p8',
-    brand: 'Tissot',
-    name: 'Gentleman Powermatic',
-    image: 'https://picsum.photos/seed/aw8/800/800',
-    price: 850,
+    brand: 'Seiko',
+    name: 'Grand Seiko Snowflake',
+    image: 'assets/images/gs_snowflake.png',
+    price: 1400,
     rating: 4.2,
   ),
 ];
+// ---- Image helper: uses assets if path starts with 'assets/', else network ----
+Widget productImage(
+  String path, {
+  BoxFit fit = BoxFit.cover,
+  double? height,
+  double? width,
+  BorderRadius? radius,
+}) {
+  final Widget img = path.startsWith('assets/')
+      ? Image.asset(path, fit: fit, height: height, width: width)
+      : Image.network(path, fit: fit, height: height, width: width);
+  return radius == null ? img : ClipRRect(borderRadius: radius, child: img);
+}
 
-/*  SHELL */
+/* ============================== SHELL =================================== */
 
 class HomeShell extends StatefulWidget {
   const HomeShell({super.key});
@@ -157,9 +169,19 @@ class HomeShell extends StatefulWidget {
 class _HomeShellState extends State<HomeShell> {
   int _index = 0;
 
-  void _soon() => ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Coming soon (demo)')),
-      );
+  void _soon() => ScaffoldMessenger.of(context)
+      .showSnackBar(const SnackBar(content: Text('Coming soon (demo)')));
+
+  Widget _body(bool isTablet) {
+    switch (_index) {
+      case 0:
+        return LuxeHome(isTablet: isTablet);
+      case 1:
+        return const SearchPage(); // NEW: Search page
+      default:
+        return LuxeHome(isTablet: isTablet);
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -167,30 +189,31 @@ class _HomeShellState extends State<HomeShell> {
       builder: (_, constraints) {
         final bool isTablet = constraints.maxWidth >= 900;
 
-        final Widget body = LuxeHome(isTablet: isTablet);
-
         if (!isTablet) {
-          // PHONE: bottom nav
+          // PHONE
           return Scaffold(
-            body: body,
+            body: _body(isTablet),
             bottomNavigationBar: NavigationBar(
               selectedIndex: _index,
               onDestinationSelected: (i) {
                 setState(() => _index = i);
-                if (i != 0) _soon(); // keep Home only for now
+                if (i >= 2) _soon(); // Wishlist/Cart/Profile
               },
               destinations: const [
                 NavigationDestination(icon: Icon(Icons.home), label: 'Home'),
                 NavigationDestination(icon: Icon(Icons.search), label: 'Search'),
-                NavigationDestination(icon: Icon(Icons.favorite_border), label: 'Wishlist'),
-                NavigationDestination(icon: Icon(Icons.shopping_cart_outlined), label: 'Cart'),
-                NavigationDestination(icon: Icon(Icons.person_outline), label: 'Profile'),
+                NavigationDestination(
+                    icon: Icon(Icons.favorite_border), label: 'Wishlist'),
+                NavigationDestination(
+                    icon: Icon(Icons.shopping_cart_outlined), label: 'Cart'),
+                NavigationDestination(
+                    icon: Icon(Icons.person_outline), label: 'Profile'),
               ],
             ),
           );
         }
 
-        // TABLET: side rail
+        // TABLET
         return Scaffold(
           body: Row(
             children: [
@@ -198,7 +221,7 @@ class _HomeShellState extends State<HomeShell> {
                 selectedIndex: _index,
                 onDestinationSelected: (i) {
                   setState(() => _index = i);
-                  if (i != 0) _soon();
+                  if (i >= 2) _soon();
                 },
                 extended: true,
                 leading: Padding(
@@ -214,14 +237,18 @@ class _HomeShellState extends State<HomeShell> {
                     selectedIcon: Icon(Icons.home),
                     label: Text('Home'),
                   ),
-                  NavigationRailDestination(icon: Icon(Icons.search), label: Text('Search')),
-                  NavigationRailDestination(icon: Icon(Icons.favorite_border), label: Text('Wishlist')),
-                  NavigationRailDestination(icon: Icon(Icons.shopping_cart_outlined), label: Text('Cart')),
-                  NavigationRailDestination(icon: Icon(Icons.person_outline), label: Text('Profile')),
+                  NavigationRailDestination(
+                      icon: Icon(Icons.search), label: Text('Search')),
+                  NavigationRailDestination(
+                      icon: Icon(Icons.favorite_border), label: Text('Wishlist')),
+                  NavigationRailDestination(
+                      icon: Icon(Icons.shopping_cart_outlined), label: Text('Cart')),
+                  NavigationRailDestination(
+                      icon: Icon(Icons.person_outline), label: Text('Profile')),
                 ],
               ),
               const VerticalDivider(width: 1),
-              Expanded(child: body),
+              Expanded(child: _body(isTablet)),
             ],
           ),
         );
@@ -230,7 +257,7 @@ class _HomeShellState extends State<HomeShell> {
   }
 }
 
-/* HOME  */
+/* ============================== HOME ==================================== */
 
 class LuxeHome extends StatelessWidget {
   final bool isTablet;
@@ -238,9 +265,11 @@ class LuxeHome extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final featured = kProducts.take(4).toList(); // show only 4
 
     return CustomScrollView(
       slivers: [
+        // Small, clean top app bar per Android guidelines
         SliverAppBar(
           pinned: true,
           title: const Text('LuxeWatch'),
@@ -252,40 +281,38 @@ class LuxeHome extends StatelessWidget {
           ],
         ),
 
-        // ✅ ALWAYS show hero (compact on phones, wide on tablets)
+        // Explore header + chips (Material action chips)
         SliverToBoxAdapter(
           child: Padding(
-            padding: const EdgeInsets.all(16),
-            child: HeroBanner(isWide: isTablet),
-          ),
-        ),
-
-        // Categories (chips)
-        SliverToBoxAdapter(
-          child: SizedBox(
-            height: 44,
-            child: ListView(
-              padding: const EdgeInsets.symmetric(horizontal: 12),
-              scrollDirection: Axis.horizontal,
+            padding: const EdgeInsets.fromLTRB(16, 12, 16, 4),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: const [
-                _CategoryChip(label: 'All', selected: true),
-                _CategoryChip(label: 'Sports'),
-                _CategoryChip(label: 'Dress'),
-                _CategoryChip(label: 'Vintage'),
-                _CategoryChip(label: 'Limited'),
+                Text('Explore', style: TextStyle(fontSize: 26, fontWeight: FontWeight.w800)),
+                SizedBox(height: 12),
+                ExploreChipsSection(),
               ],
             ),
           ),
         ),
-        const SliverToBoxAdapter(child: SizedBox(height: 8)),
 
-        // Product grid
+        // Promo banner with image + overlay text CTA
+        SliverToBoxAdapter(
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+            child: PromoBanner(isWide: isTablet),
+          ),
+        ),
+
+        SliverToBoxAdapter(child: SectionTitle(title: 'Featured')),
+
+        // Featured grid (4 items)
         SliverPadding(
-          padding: const EdgeInsets.all(12),
+          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
           sliver: SliverGrid(
             delegate: SliverChildBuilderDelegate(
-              (context, i) => ProductCard(product: kProducts[i]),
-              childCount: kProducts.length,
+              (context, i) => ProductCard(product: featured[i]),
+              childCount: featured.length,
             ),
             gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
               crossAxisCount: isTablet ? 4 : 2,
@@ -295,10 +322,258 @@ class LuxeHome extends StatelessWidget {
             ),
           ),
         ),
+
+        // Nice finishing section (kept from before)
+        const SliverToBoxAdapter(
+          child: Padding(
+            padding: EdgeInsets.all(16),
+            child: OurPromiseCard(),
+          ),
+        ),
+        const SliverToBoxAdapter(child: SizedBox(height: 24)),
       ],
     );
   }
 }
+
+class SectionTitle extends StatelessWidget {
+  final String title;
+  const SectionTitle({super.key, required this.title});
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(16, 8, 16, 8),
+      child: Text(
+        title,
+        style: Theme.of(context).textTheme.titleLarge,
+      ),
+    );
+  }
+}
+
+class OurPromiseCard extends StatelessWidget {
+  const OurPromiseCard({super.key});
+  @override
+  Widget build(BuildContext context) {
+    final cs = Theme.of(context).colorScheme;
+    return Card(
+      child: Padding(
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text('Our Promise', style: Theme.of(context).textTheme.titleLarge),
+            const SizedBox(height: 8),
+            const Text('Craftsmanship • Authenticity • Care'),
+            const SizedBox(height: 12),
+            Row(
+              children: [
+                _IconLine(icon: Icons.verified, label: '2-Year Warranty'),
+                const SizedBox(width: 12),
+                _IconLine(icon: Icons.local_shipping_outlined, label: 'Free Shipping'),
+                const SizedBox(width: 12),
+                _IconLine(icon: Icons.build_outlined, label: 'Lifetime Service'),
+              ],
+            ),
+            const SizedBox(height: 12),
+            FilledButton(
+              onPressed: () {},
+              style: ButtonStyle(
+                backgroundColor: WidgetStatePropertyAll(cs.primary.withOpacity(0.16)),
+                foregroundColor: WidgetStatePropertyAll(cs.onSurface)
+              ),
+              child: const Text('Learn more'),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _IconLine extends StatelessWidget {
+  final IconData icon;
+  final String label;
+  const _IconLine({required this.icon, required this.label});
+  @override
+  Widget build(BuildContext context) {
+    return Expanded(
+      child: Row(
+        children: [
+          Icon(icon, size: 18),
+          const SizedBox(width: 6),
+          Flexible(child: Text(label, overflow: TextOverflow.ellipsis)),
+        ],
+      ),
+    );
+    }
+}
+
+class ExploreChipsSection extends StatelessWidget {
+  const ExploreChipsSection({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    final cs = Theme.of(context).colorScheme;
+
+    // Helper to build a standard action chip per Material 3
+    Widget chip(IconData icon, String label, VoidCallback onTap) {
+      return Padding(
+        padding: const EdgeInsets.only(right: 8, bottom: 8),
+        child: ActionChip.elevated(
+          avatar: Icon(icon, size: 18),
+          label: Text(label),
+          onPressed: onTap,
+          elevation: 0,
+          backgroundColor: cs.surfaceContainerLowest,
+        ),
+      );
+    }
+
+    // Use Wrap for automatic wrapping on small screens
+    return Wrap(
+      children: [
+        chip(Icons.star_rate_rounded, 'Best Sellers', () {}),
+        chip(Icons.watch_rounded, 'New Arrivals', () {}),
+        chip(Icons.diamond_outlined, 'Limited', () {}),
+        chip(Icons.swipe_rounded, 'Dress', () {}),
+        chip(Icons.fitness_center_rounded, 'Sports', () {}),
+      ],
+    );
+  }
+}
+class PromoBanner extends StatelessWidget {
+  final bool isWide;
+  const PromoBanner({super.key, required this.isWide});
+
+  @override
+  Widget build(BuildContext context) {
+    final cs = Theme.of(context).colorScheme;
+
+    final image = ClipRRect(
+      borderRadius: BorderRadius.circular(16),
+      child: Stack(
+        children: [
+          // Replace with your own asset later if you want
+          Image.network(
+            'https://picsum.photos/seed/luxe_banner/1200/700',
+            height: isWide ? 220 : 180,
+            width: double.infinity,
+            fit: BoxFit.cover,
+          ),
+          // Gradient for legible text
+          Positioned.fill(
+            child: DecoratedBox(
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  begin: Alignment.bottomCenter,
+                  end: Alignment.topCenter,
+                  colors: [
+                    Colors.black.withOpacity(0.55),
+                    Colors.transparent,
+                  ],
+                ),
+              ),
+            ),
+          ),
+          // Text overlay
+          Positioned(
+            left: 16,
+            right: 16,
+            bottom: 16,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  'Get custom recs for your next timepiece',
+                  style: const TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.w900,
+                    color: Colors.white,
+                  ),
+                ),
+                const SizedBox(height: 6),
+                const Text(
+                  'Curated picks based on what you like.',
+                  style: TextStyle(color: Colors.white70),
+                ),
+                const SizedBox(height: 10),
+                FilledButton.tonal(
+                  style: ButtonStyle(
+                    backgroundColor: WidgetStatePropertyAll(
+                      cs.primary.withOpacity(0.25),
+                    ),
+                  ),
+                  onPressed: () {},
+                  child: const Text('Explore Collection'),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+
+    return image;
+  }
+}
+
+/* ============================== SEARCH ================================== */
+
+class SearchPage extends StatelessWidget {
+  const SearchPage({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    // Simple “search results” list (no actual filtering required yet)
+    return Column(
+      children: [
+        const SizedBox(height: 8),
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 16),
+          child: TextField(
+            decoration: InputDecoration(
+              hintText: 'Search watches',
+              prefixIcon: const Icon(Icons.search),
+              border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+            ),
+            onChanged: (q) {
+              // optional: wire up filtering later
+            },
+          ),
+        ),
+        const SizedBox(height: 8),
+        const Divider(height: 1),
+        Expanded(
+          child: ListView.separated(
+            itemCount: kProducts.length,
+            separatorBuilder: (_, __) => const Divider(height: 1),
+            itemBuilder: (context, i) {
+              final p = kProducts[i];
+              return ListTile(
+                leading: ClipRRect(
+                  borderRadius: BorderRadius.circular(8),
+                  child: productImage(p.image, width: 56, height: 56, fit: BoxFit.cover),
+                ),
+                title: Text(p.name, maxLines: 1, overflow: TextOverflow.ellipsis),
+                subtitle: Text('${p.brand} • \$${p.price.toStringAsFixed(0)}'),
+                trailing: const Icon(Icons.chevron_right),
+                onTap: () {
+                  Navigator.of(context).push(
+                    MaterialPageRoute(builder: (_) => ProductDetailPage(product: p)),
+                  );
+                },
+              );
+            },
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+/* ============================ HERO BANNER ================================ */
 
 class HeroBanner extends StatelessWidget {
   final bool isWide; // tablet/desktop = true, phone = false
@@ -308,9 +583,8 @@ class HeroBanner extends StatelessWidget {
   Widget build(BuildContext context) {
     final cs = Theme.of(context).colorScheme;
 
-    // Shared content
-    final title = Text('Good Morning',
-        style: Theme.of(context).textTheme.titleLarge);
+    final title =
+        Text('Good Morning', style: Theme.of(context).textTheme.titleLarge);
     const subtitle = Text('Discover exquisite timepieces');
     final tag = Container(
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
@@ -320,11 +594,7 @@ class HeroBanner extends StatelessWidget {
       ),
       child: const Text('New Collection • Heritage Series'),
     );
-    final cta = FilledButton(
-      onPressed: () {},
-      child: const Text('Explore Collection'),
-    );
-
+    final cta = FilledButton(onPressed: () {}, child: const Text('Explore Collection'));
     final image = ClipRRect(
       borderRadius: BorderRadius.circular(12),
       child: Image.network(
@@ -335,7 +605,6 @@ class HeroBanner extends StatelessWidget {
       ),
     );
 
-    // Phone: stacked (image below text)
     if (!isWide) {
       return Card(
         child: Padding(
@@ -358,7 +627,6 @@ class HeroBanner extends StatelessWidget {
       );
     }
 
-    // Tablet: side-by-side
     return Card(
       child: Padding(
         padding: const EdgeInsets.all(16),
@@ -387,29 +655,7 @@ class HeroBanner extends StatelessWidget {
   }
 }
 
-
-/* ============================ UI WIDGETS ================================= */
-
-class _CategoryChip extends StatelessWidget {
-  final String label;
-  final bool selected;
-  const _CategoryChip({required this.label, this.selected = false});
-
-  @override
-  Widget build(BuildContext context) {
-    final cs = Theme.of(context).colorScheme;
-    return Container(
-      margin: const EdgeInsets.only(right: 8),
-      child: FilterChip(
-        selected: selected,
-        onSelected: (_) {},
-        label: Text(label),
-        selectedColor: cs.primary.withOpacity(0.18),
-        showCheckmark: false,
-      ),
-    );
-  }
-}
+/* ============================ PRODUCT CARD =============================== */
 
 class ProductCard extends StatelessWidget {
   final Product product;
@@ -417,68 +663,118 @@ class ProductCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-
     return Card(
-  clipBehavior: Clip.antiAlias,
-  child: InkWell(
-    onTap: () {
-      Navigator.of(context).push(
-        PageRouteBuilder(
-          transitionDuration: const Duration(milliseconds: 250),
-          pageBuilder: (_, a, __) =>
-              FadeTransition(opacity: a, child: ProductDetailPage(product: product)),
-        ),
-      );
-    },
-    child: Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Expanded(
-          child: Stack(
-            children: [
-              // HERO wraps the image here:
-              Positioned.fill(
-                child: Hero(
-                  tag: 'pimg-${product.id}',
-                  child: Image.network(product.image, fit: BoxFit.cover),
-                ),
-              ),
-              Positioned(
-                top: 8,
-                right: 8,
-                child: Container(
-                  decoration: BoxDecoration(
-                    color: Colors.black.withOpacity(0.25),
-                    shape: BoxShape.circle,
-                  ),
-                  child: IconButton(
-                    onPressed: () {},
-                    icon: const Icon(Icons.favorite_border),
-                  ),
-                ),
-              ),
-              if (product.onSale)
-                Positioned(
-                  top: 10,
-                  left: 10,
-                  child: Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                    decoration: BoxDecoration(
-                      color: Theme.of(context).colorScheme.primary,
-                      borderRadius: BorderRadius.circular(8),
+      clipBehavior: Clip.antiAlias,
+      child: InkWell(
+        onTap: () {
+          Navigator.of(context).push(
+            PageRouteBuilder(
+              transitionDuration: const Duration(milliseconds: 250),
+              pageBuilder: (_, a, __) =>
+                  FadeTransition(opacity: a, child: ProductDetailPage(product: product)),
+            ),
+          );
+        },
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Expanded(
+              child: Stack(
+                children: [
+                  Positioned.fill(
+                    child: Hero(
+                      tag: 'pimg-${product.id}',
+                      child: productImage(product.image, fit: BoxFit.cover),
                     ),
-                    child: const Text('Sale', style: TextStyle(fontWeight: FontWeight.w700)),
                   ),
-                ),
-            ],
-          ),
+                  Positioned(
+                    top: 8,
+                    right: 8,
+                    child: Container(
+                      decoration: BoxDecoration(
+                        color: Colors.black.withOpacity(0.25),
+                        shape: BoxShape.circle,
+                      ),
+                      child: IconButton(
+                        onPressed: () {},
+                        icon: const Icon(Icons.favorite_border),
+                      ),
+                    ),
+                  ),
+                  if (product.onSale)
+                    Positioned(
+                      top: 10,
+                      left: 10,
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                        decoration: BoxDecoration(
+                          color: Theme.of(context).colorScheme.primary,
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                        child: const Text('Sale',
+                            style: TextStyle(fontWeight: FontWeight.w700)),
+                      ),
+                    ),
+                ],
+              ),
+            ),
+            Padding(
+              padding: const EdgeInsets.all(12),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(children: [
+                    ...List.generate(
+                      5,
+                      (i) => Icon(
+                        i < product.rating.round()
+                            ? Icons.star
+                            : Icons.star_border,
+                        size: 14,
+                        color: Theme.of(context).colorScheme.primary,
+                      ),
+                    ),
+                    const SizedBox(width: 6),
+                    Text('(${product.rating.toStringAsFixed(1)})',
+                        style: const TextStyle(fontSize: 12)),
+                  ]),
+                  const SizedBox(height: 6),
+                  Text(product.brand,
+                      style: const TextStyle(fontSize: 12, color: Colors.white70)),
+                  Text(
+                    product.name,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: const TextStyle(fontWeight: FontWeight.w700),
+                  ),
+                  const SizedBox(height: 6),
+                  Row(
+                    children: [
+                      Text('\$${product.price.toStringAsFixed(0)}',
+                          style: const TextStyle(
+                              fontWeight: FontWeight.w700, fontSize: 16)),
+                      if (product.oldPrice != null) ...[
+                        const SizedBox(width: 8),
+                        Text('\$${product.oldPrice!.toStringAsFixed(0)}',
+                            style: const TextStyle(
+                              decoration: TextDecoration.lineThrough,
+                              color: Colors.white60,
+                            )),
+                      ],
+                    ],
+                  ),
+                ],
+              ),
+            ),
+          ],
         ),
-      ],
-    ),
-  ),
-);
+      ),
+    );
+  }
 }
-}
+
+/* ========================= PRODUCT DETAIL PAGE =========================== */
+
 class ProductDetailPage extends StatelessWidget {
   final Product product;
   const ProductDetailPage({super.key, required this.product});
@@ -494,21 +790,18 @@ class ProductDetailPage extends StatelessWidget {
         children: [
           Hero(
             tag: 'pimg-${product.id}',
-            child: ClipRRect(
-              borderRadius: BorderRadius.circular(16),
-              child: Image.network(
-                product.image,
-                height: 280,
-                fit: BoxFit.cover,
-              ),
+            child: productImage(
+              product.image,
+              height: 280,
+              fit: BoxFit.cover,
+              radius: BorderRadius.circular(16),
             ),
           ),
           const SizedBox(height: 16),
-
-          Text(product.brand, style: TextStyle(color: cs.primary, fontWeight: FontWeight.w600)),
+          Text(product.brand,
+              style: TextStyle(color: cs.primary, fontWeight: FontWeight.w600)),
           const SizedBox(height: 6),
           Text(product.name, style: Theme.of(context).textTheme.titleLarge),
-
           const SizedBox(height: 10),
           Row(
             children: [
@@ -516,14 +809,14 @@ class ProductDetailPage extends StatelessWidget {
                 5,
                 (i) => Icon(
                   i < product.rating.round() ? Icons.star : Icons.star_border,
-                  size: 18, color: cs.primary,
+                  size: 18,
+                  color: cs.primary,
                 ),
               ),
               const SizedBox(width: 8),
               Text('(${product.rating.toStringAsFixed(1)})'),
             ],
           ),
-
           const SizedBox(height: 12),
           Row(
             children: [
@@ -539,13 +832,11 @@ class ProductDetailPage extends StatelessWidget {
               ],
             ],
           ),
-
           const SizedBox(height: 16),
           const Text(
             "A refined timepiece crafted with premium materials. "
             "This is a demo description to satisfy the coursework requirement.",
           ),
-
           const SizedBox(height: 20),
           FilledButton.icon(
             onPressed: () {
@@ -561,4 +852,3 @@ class ProductDetailPage extends StatelessWidget {
     );
   }
 }
-
