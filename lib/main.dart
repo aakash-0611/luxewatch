@@ -287,7 +287,7 @@ class HomeShell extends StatefulWidget {
   State<HomeShell> createState() => _HomeShellState();
 }
 
-// Navigation Logic
+// Navigation Logicflutter 
 class _HomeShellState extends State<HomeShell> {
   int _index = 0;
 
@@ -394,7 +394,7 @@ class LuxeHome extends StatelessWidget {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: const [
                       Text('LUXEWATCH',
-                          style: TextStyle(fontSize: 35, fontWeight: FontWeight.w900)),
+                          style: TextStyle(fontSize: 28, fontWeight: FontWeight.w900)),
                       SizedBox(height: 4),
                     ],
                   ),
@@ -849,19 +849,6 @@ class ProductsPage extends StatelessWidget {
 
     return CustomScrollView(
       slivers: [
-        SliverToBoxAdapter(
-          child: Padding(
-            padding: const EdgeInsets.fromLTRB(16, 12, 16, 4),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: const [
-                Text('Explore', style: TextStyle(fontSize: 26, fontWeight: FontWeight.w700)),
-                SizedBox(height: 12),
-                ExploreChipsSection(),
-              ],
-            ),
-          ),
-        ),
         SliverAppBar(pinned: true, title: const Text('Products'), actions: [buildUserMenuAction(context)]),
         SliverPadding(
           padding: const EdgeInsets.all(12),
