@@ -287,7 +287,7 @@ class HomeShell extends StatefulWidget {
   State<HomeShell> createState() => _HomeShellState();
 }
 
-//
+// Navigation Logic
 class _HomeShellState extends State<HomeShell> {
   int _index = 0;
 
