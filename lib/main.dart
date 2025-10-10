@@ -1,4 +1,8 @@
 import 'package:flutter/material.dart';
+import 'screens/splash_screen.dart';
+
+// Global theme controller
+final ValueNotifier<ThemeMode> appThemeMode = ValueNotifier(ThemeMode.system);
 
 void main() => runApp(const LuxeWatchApp());
 
@@ -7,33 +11,49 @@ class LuxeWatchApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // ---- LIGHT THEME ----
+
+    /* COLOUR SCHEME FOR APP */ 
+
+    // LIGHT THEME 
     final ThemeData light = ThemeData(
       useMaterial3: true,
       colorScheme: ColorScheme.fromSeed(
-        seedColor: const Color(0xFFD4AF37), // luxe gold
+        seedColor: const Color(0xFFD4AF37), // gold
         brightness: Brightness.light,
+      ).copyWith(
+        primary: const Color(0xFFD4AF37),
+        onPrimary: Colors.black,
+        surface: const Color(0xFFF7F4ED),      // light background tones
+        background: const Color(0xFFF7F4ED),
+        onSurface: const Color(0xFF0B0F14),    // dark text on light bg
+        onBackground: const Color(0xFF0B0F14),
       ),
+      scaffoldBackgroundColor: const Color(0xFFF7F4ED),
       textTheme: const TextTheme(
-        titleLarge: TextStyle(fontWeight: FontWeight.w800),
+        titleLarge: TextStyle(fontWeight: FontWeight.w800, color: Color(0xFF0B0F14)),
+        bodyLarge: TextStyle(color: Color(0xFF0B0F14)),
+        bodyMedium: TextStyle(color: Color(0xFF3A4048)),
       ),
-      appBarTheme: const AppBarTheme(centerTitle: false),
+      appBarTheme: const AppBarTheme(
+        centerTitle: false,
+        backgroundColor: Color(0xFFF7F4ED),
+        foregroundColor: Color(0xFF0B0F14),
+        elevation: 0,
+      ),
       navigationBarTheme: NavigationBarThemeData(
-        backgroundColor: const Color(0xFF0B0F14),
+        backgroundColor: const Color(0xFFF7F4ED),
         indicatorColor: const Color(0xFFD4AF37),
         labelBehavior: NavigationDestinationLabelBehavior.alwaysShow,
-        iconTheme: WidgetStatePropertyAll(
-          IconThemeData(color: Colors.white70),
-        ),
-        labelTextStyle: WidgetStatePropertyAll(
-          const TextStyle(color: Colors.white70, fontWeight: FontWeight.w600),
+        iconTheme: const WidgetStatePropertyAll(IconThemeData(color: Color(0xFF3A4048))),
+        labelTextStyle: const WidgetStatePropertyAll(
+          TextStyle(color: Color(0xFF3A4048), fontWeight: FontWeight.w600),
         ),
       ),
       chipTheme: ChipThemeData(
-        shape: StadiumBorder(side: BorderSide(color: const Color(0xFF1A1F26))),
-        backgroundColor: const Color(0xFF161B22),
+        shape: const StadiumBorder(),
+        backgroundColor: const Color(0xFFEDE9DF),
         selectedColor: const Color(0x33D4AF37),
-        labelStyle: const TextStyle(fontWeight: FontWeight.w600),
+        labelStyle: const TextStyle(fontWeight: FontWeight.w600, color: Color(0xFF0B0F14)),
         side: const BorderSide(color: Colors.transparent),
         padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
       ),
@@ -45,6 +65,8 @@ class LuxeWatchApp extends StatelessWidget {
           padding: const WidgetStatePropertyAll(
             EdgeInsets.symmetric(horizontal: 18, vertical: 12),
           ),
+          backgroundColor: const WidgetStatePropertyAll(Color(0xFFD4AF37)),
+          foregroundColor: const WidgetStatePropertyAll(Colors.black),
         ),
       ),
       outlinedButtonTheme: OutlinedButtonThemeData(
@@ -53,11 +75,13 @@ class LuxeWatchApp extends StatelessWidget {
             RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
           ),
           side: const WidgetStatePropertyAll(BorderSide(color: Color(0xFFD4AF37))),
+          foregroundColor: const WidgetStatePropertyAll(Color(0xFFD4AF37)),
         ),
       ),
       cardTheme: const CardThemeData(
-        color: Color(0xFF11151B),
-        elevation: 0,
+        color: Colors.white,
+        elevation: 1,
+        shadowColor: Color(0x22000000),
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.all(Radius.circular(18)),
         ),
@@ -65,7 +89,8 @@ class LuxeWatchApp extends StatelessWidget {
       ),
     );
 
-    // ---- DARK THEME ----
+
+    // DARK THEME 
     final ThemeData dark = ThemeData(
       useMaterial3: true,
       colorScheme: ColorScheme.fromSeed(
@@ -125,20 +150,27 @@ class LuxeWatchApp extends StatelessWidget {
       ),
     );
 
-
-    return MaterialApp(
-      debugShowCheckedModeBanner: false,
-      title: 'LuxeWatch',
-      theme: light,
-      darkTheme: dark,
-      themeMode: ThemeMode.system,
-      home: const HomeShell(),
+    // App initialization
+    return ValueListenableBuilder<ThemeMode>(
+      valueListenable: appThemeMode,
+      builder: (_, mode, __) {
+        return MaterialApp(
+          debugShowCheckedModeBanner: false,
+          title: 'LuxeWatch',
+          theme: light,     
+          darkTheme: dark,  
+          themeMode: mode,   
+          home: const SplashScreen(),
+        );
+      },
     );
+
   }
 }
 
-/* =============================== DATA ================================== */
+/* DATA */
 
+// Product model
 class Product {
   final String id, brand, name, image;
   final double price;
@@ -157,6 +189,7 @@ class Product {
   });
 }
 
+//Data Seed for products
 const List<Product> kProducts = [
   Product(
     id: 'p1',
@@ -179,7 +212,7 @@ const List<Product> kProducts = [
     id: 'p3',
     brand: 'Patek Philippe',
     name: 'Calatrava Heritage',
-    image: 'assets/images/patek_aquanaut.avif', // consider .jpg/.png
+    image: 'assets/images/patek-nautilus.png', 
     price: 32000,
     rating: 4.9,
   ),
@@ -197,7 +230,7 @@ const List<Product> kProducts = [
     id: 'p5',
     brand: 'Rolex',
     name: 'Day-Date Platinum',
-    image: 'assets/images/rolex_datejust.avif', // consider .jpg/.png
+    image: 'assets/images/rolex1.png', 
     price: 54000,
     rating: 4.9,
   ),
@@ -205,7 +238,7 @@ const List<Product> kProducts = [
     id: 'p6',
     brand: 'Cartier',
     name: 'Santos De Cartier',
-    image: 'assets/images/cartier_santos.avif', // consider .jpg/.png
+    image: 'assets/images/watch3.png',
     price: 7800,
     oldPrice: 9200,
     rating: 4.5,
@@ -229,7 +262,7 @@ const List<Product> kProducts = [
   ),
 ];
 
-// ---- Image helper: uses assets if path starts with 'assets/', else network ----
+// Image helper to fetch local images
 Widget productImage(
   String path, {
   BoxFit fit = BoxFit.cover,
@@ -246,7 +279,7 @@ Widget productImage(
   return radius == null ? img : ClipRRect(borderRadius: radius, child: img);
 }
 
-/* ============================== SHELL =================================== */
+/* SHELL */
 
 class HomeShell extends StatefulWidget {
   const HomeShell({super.key});
@@ -254,6 +287,7 @@ class HomeShell extends StatefulWidget {
   State<HomeShell> createState() => _HomeShellState();
 }
 
+//
 class _HomeShellState extends State<HomeShell> {
   int _index = 0;
 
@@ -264,15 +298,17 @@ class _HomeShellState extends State<HomeShell> {
       case 1:
         return const SearchPage();
       case 2:
-        return const WishlistPage(); // static wishlist with red buttons
+        return const WishlistPage(); 
       case 3:
-        return const ProductsPage(); // full grid
+        return const ProductsPage(); 
       case 4:
-        return const CartPage(); // NEW: cart example
+        return const CartPage(); 
       default:
         return LuxeHome(isTablet: isTablet);
     }
   }
+
+//Checks Device Width to decide whether to show NavigationRail or NavigationBar
 
   @override
   Widget build(BuildContext context) {
@@ -298,38 +334,38 @@ class _HomeShellState extends State<HomeShell> {
           );
         }
 
-        // TABLET
-        return Scaffold(
-          body: Row(
-            children: [
-              NavigationRail(
-                selectedIndex: _index,
-                onDestinationSelected: (i) => setState(() => _index = i),
-                extended: true,
-                leading: Padding(
-                  padding: const EdgeInsets.all(8),
-                  child: CircleAvatar(
-                    backgroundColor: Theme.of(context).colorScheme.primary,
-                    child: const Text('W'),
+          // TABLET
+          return Scaffold(
+            body: Row(
+              children: [
+                NavigationRail(
+                  selectedIndex: _index,
+                  onDestinationSelected: (i) => setState(() => _index = i),
+                  extended: true,
+                  leading: Padding(
+                    padding: const EdgeInsets.all(8),
+                    child: CircleAvatar(
+                      backgroundColor: Theme.of(context).colorScheme.primary,
+                      child: const Text('W'),
+                    ),
                   ),
+                  destinations: const [
+                    NavigationRailDestination(
+                      icon: Icon(Icons.home_outlined),
+                      selectedIcon: Icon(Icons.home),
+                      label: Text('Home'),
+                    ),
+                    NavigationRailDestination(icon: Icon(Icons.search), label: Text('Search')),
+                    NavigationRailDestination(icon: Icon(Icons.favorite_border), label: Text('Wishlist')),
+                    NavigationRailDestination(icon: Icon(Icons.storefront), label: Text('Products')),
+                    NavigationRailDestination(icon: Icon(Icons.shopping_cart_outlined), label: Text('Cart')),
+                  ],
                 ),
-                destinations: const [
-                  NavigationRailDestination(
-                    icon: Icon(Icons.home_outlined),
-                    selectedIcon: Icon(Icons.home),
-                    label: Text('Home'),
-                  ),
-                  NavigationRailDestination(icon: Icon(Icons.search), label: Text('Search')),
-                  NavigationRailDestination(icon: Icon(Icons.favorite_border), label: Text('Wishlist')),
-                  NavigationRailDestination(icon: Icon(Icons.storefront), label: Text('Products')),
-                  NavigationRailDestination(icon: Icon(Icons.shopping_cart_outlined), label: Text('Cart')),
-                ],
-              ),
-              const VerticalDivider(width: 1),
-              Expanded(child: _body(isTablet)),
-            ],
-          ),
-        );
+                const VerticalDivider(width: 1),
+                Expanded(child: _body(isTablet)),
+              ],
+            ),
+          );
       },
     );
   }
@@ -350,24 +386,25 @@ class LuxeHome extends StatelessWidget {
         // Header row: "Good Morning" + avatar menu (Material 3)
         SliverToBoxAdapter(
           child: Padding(
-            padding: const EdgeInsets.fromLTRB(16, 12, 16, 8),
+            padding: const EdgeInsets.fromLTRB(16, 12, 16, 6),
             child: Row(
               children: [
                 Expanded(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: const [
-                      Text('Hey There!,', style: TextStyle(fontSize: 24, fontWeight: FontWeight.w900)),
+                      Text('LUXEWATCH',
+                          style: TextStyle(fontSize: 35, fontWeight: FontWeight.w900)),
                       SizedBox(height: 4),
                     ],
                   ),
                 ),
-                // little avatar with menu
                 buildUserMenuAction(context),
               ],
             ),
           ),
         ),
+
         // Explore header + chips
         SliverToBoxAdapter(
           child: Padding(
@@ -375,7 +412,7 @@ class LuxeHome extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: const [
-                Text('Explore', style: TextStyle(fontSize: 26, fontWeight: FontWeight.w800)),
+                Text('Explore', style: TextStyle(fontSize: 26, fontWeight: FontWeight.w700)),
                 SizedBox(height: 12),
                 ExploreChipsSection(),
               ],
@@ -423,37 +460,70 @@ class LuxeHome extends StatelessWidget {
   }
 }
 
-/* ============================= REUSABLES ================================= */
+/* REUSABLES */
 
-enum _MenuItem { account, privacy, settings, help, signout }
+// User avatar with popup menu
+enum _MenuItem { account, privacy, settings, help, theme, signout }
 
-PopupMenuButton _menu({required BuildContext context}) => PopupMenuButton<_MenuItem>(
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-      onSelected: (m) {
-        final text = switch (m) {
-          _MenuItem.account => 'Account',
-          _MenuItem.privacy => 'Privacy',
-          _MenuItem.settings => 'Settings',
-          _MenuItem.help => 'Help & Support',
-          _MenuItem.signout => 'Sign out',
-        };
-        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('$text (demo)')));
-      },
-      itemBuilder: (ctx) => const [
-        PopupMenuItem(value: _MenuItem.account, child: Text('Account')),
-        PopupMenuItem(value: _MenuItem.privacy, child: Text('Privacy')),
-        PopupMenuItem(value: _MenuItem.settings, child: Text('Settings')),
-        PopupMenuItem(value: _MenuItem.help, child: Text('Help & Support')),
-        PopupMenuItem(value: _MenuItem.signout, child: Text('Sign out')),
-      ],
-      child: Padding(
-        padding: const EdgeInsets.only(right: 12),
-        child: CircleAvatar(
-          radius: 16,
-          child: Text('W', style: TextStyle(color: Theme.of(context).colorScheme.onPrimary)),
+PopupMenuButton<_MenuItem> _menu({required BuildContext context}) {
+  final isDark = Theme.of(context).brightness == Brightness.dark;
+
+  return PopupMenuButton<_MenuItem>(
+    tooltip: '', // <- removes the “Show menu” tooltip bubble
+    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+    onSelected: (m) {
+      switch (m) {
+        case _MenuItem.account:
+          ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Account (demo)')));
+          break;
+        case _MenuItem.privacy:
+          ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Privacy (demo)')));
+          break;
+        case _MenuItem.settings:
+          ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Settings (demo)')));
+          break;
+        case _MenuItem.help:
+          ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Help & Support (demo)')));
+          break;
+        case _MenuItem.theme:
+          // Toggle between light and dark (you can also cycle system→light→dark if you want)
+          appThemeMode.value =
+              (appThemeMode.value == ThemeMode.dark) ? ThemeMode.light : ThemeMode.dark;
+          break;
+        case _MenuItem.signout:
+          ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Sign out (demo)')));
+          break;
+      }
+    },
+    itemBuilder: (ctx) => [
+      const PopupMenuItem(value: _MenuItem.account,  child: Text('Account')),
+      const PopupMenuItem(value: _MenuItem.privacy,  child: Text('Privacy')),
+      const PopupMenuItem(value: _MenuItem.settings, child: Text('Settings')),
+      const PopupMenuItem(value: _MenuItem.help,     child: Text('Help & Support')),
+      PopupMenuItem(
+        value: _MenuItem.theme,
+        child: Row(
+          children: [
+            Icon(isDark ? Icons.light_mode : Icons.dark_mode, size: 18),
+            const SizedBox(width: 8),
+            Text(isDark ? 'Switch to Light' : 'Switch to Dark'),
+          ],
         ),
       ),
-    );
+      const PopupMenuItem(value: _MenuItem.signout,  child: Text('Sign out')),
+    ],
+    child: Padding(
+      padding: const EdgeInsets.only(right: 12),
+      child: CircleAvatar(
+        radius: 16,
+        child: Text(
+          'W',
+          style: TextStyle(color: Theme.of(context).colorScheme.onPrimary),
+        ),
+      ),
+    ),
+  );
+}
 
 Widget buildUserMenuAction(BuildContext context) => _menu(context: context);
 
@@ -470,6 +540,7 @@ class SectionTitle extends StatelessWidget {
   }
 }
 
+//Bottom widget: Our Promise card
 class OurPromiseCard extends StatelessWidget {
   const OurPromiseCard({super.key});
   @override
@@ -490,45 +561,58 @@ class OurPromiseCard extends StatelessWidget {
   }
 }
 
-/* ============================= HOME EXTRAS =============================== */
+/* EXTRA HOME WIDGETS */
 
+//Filter chips (Static, no real filtering)
 class ExploreChipsSection extends StatelessWidget {
   const ExploreChipsSection({super.key});
 
   @override
   Widget build(BuildContext context) {
     final cs = Theme.of(context).colorScheme;
-    Widget chip(IconData icon, String label) {
+    final isLight = Theme.of(context).brightness == Brightness.light;
+
+    Color textColor   = isLight ? const Color(0xFF0B0F14) : Colors.white;
+    Color bgColor     = isLight ? const Color(0xFFEDE9DF) : const Color(0xFF161B22);
+    Color selectedBg  = cs.primary.withOpacity(isLight ? 0.20 : 0.22);
+
+    Widget chip(String label, IconData icon, {bool selected = false}) {
       return Padding(
         padding: const EdgeInsets.only(right: 8, bottom: 8),
         child: FilterChip(
-          showCheckmark: false,
-          label: Row(children: [
-            Icon(icon, size: 16, color: Colors.white),
-            const SizedBox(width: 6),
-            Text(label, style: const TextStyle(fontWeight: FontWeight.w600)),
-          ]),
-          selected: label == 'All',
+          selected: selected,
           onSelected: (_) {},
-          selectedColor: cs.primary.withOpacity(0.22),
-          backgroundColor: const Color(0xFF161B22),
+          showCheckmark: false,
+          side: BorderSide.none,
+          shape: const StadiumBorder(),
+          backgroundColor: bgColor,
+          selectedColor: selectedBg,
+          label: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Icon(icon, size: 16, color: textColor),
+              const SizedBox(width: 6),
+              Text(label, style: TextStyle(fontWeight: FontWeight.w600, color: textColor)),
+            ],
+          ),
         ),
       );
     }
 
     return Wrap(
       children: [
-        chip(Icons.all_inclusive, 'All'),
-        chip(Icons.sports_score, 'Sports'),
-        chip(Icons.checkroom, 'Dress'),
-        chip(Icons.history_edu, 'Vintage'),
-        chip(Icons.workspace_premium, 'Limited'),
+        chip('All', Icons.all_inclusive, selected: true),
+        chip('Sports', Icons.sports_score),
+        chip('Dress', Icons.checkroom),
+        chip('Vintage', Icons.history_edu),
+        chip('Limited', Icons.workspace_premium),
       ],
     );
   }
 }
 
 
+//Banner card (below Filter chips)
 class PromoBanner extends StatelessWidget {
   final bool isWide;
   const PromoBanner({super.key, required this.isWide});
@@ -613,7 +697,7 @@ class PromoBanner extends StatelessWidget {
 }
 
 
-/* ============================== SEARCH ================================== */
+/* SEARCH */
 
 class SearchPage extends StatelessWidget {
   const SearchPage({super.key});
@@ -665,7 +749,7 @@ class SearchPage extends StatelessWidget {
   }
 }
 
-/* ============================== WISHLIST ================================= */
+/* WISHLIST */
 
 class WishlistPage extends StatelessWidget {
   const WishlistPage({super.key});
@@ -753,17 +837,31 @@ class _WishlistItem extends StatelessWidget {
   }
 }
 
-/* ============================== PRODUCTS ================================= */
+/* PRODUCTS */
 
 class ProductsPage extends StatelessWidget {
   const ProductsPage({super.key});
 
+  
   @override
   Widget build(BuildContext context) {
     final isWide = MediaQuery.of(context).size.width >= 900;
 
     return CustomScrollView(
       slivers: [
+        SliverToBoxAdapter(
+          child: Padding(
+            padding: const EdgeInsets.fromLTRB(16, 12, 16, 4),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: const [
+                Text('Explore', style: TextStyle(fontSize: 26, fontWeight: FontWeight.w700)),
+                SizedBox(height: 12),
+                ExploreChipsSection(),
+              ],
+            ),
+          ),
+        ),
         SliverAppBar(pinned: true, title: const Text('Products'), actions: [buildUserMenuAction(context)]),
         SliverPadding(
           padding: const EdgeInsets.all(12),
@@ -785,14 +883,16 @@ class ProductsPage extends StatelessWidget {
   }
 }
 
-/* ================================= CART ================================== */
+/* CART */
 
+// Cart item model
 class CartItem {
   final Product product;
   final int qty;
   const CartItem({required this.product, required this.qty});
 }
 
+//Cart page class reusing Seed products data
 class CartPage extends StatelessWidget {
   const CartPage({super.key});
 
@@ -810,62 +910,69 @@ class CartPage extends StatelessWidget {
       slivers: [
         SliverAppBar(pinned: true, title: const Text('Cart'), actions: [buildUserMenuAction(context)]),
 
-        // Rows of products
+        // A) Items area
         SliverToBoxAdapter(
           child: Padding(
             padding: const EdgeInsets.all(12),
             child: Column(
               children: [
-                // header row
                 _CartHeaderRow(),
                 const Divider(height: 1),
+
                 // item rows
                 ...items.map((it) => _CartRow(item: it)),
                 const Divider(height: 1),
-                const SizedBox(height: 12),
 
-                // Summary + Checkout
-                Align(
-                  alignment: Alignment.centerRight,
-                  child: ConstrainedBox(
-                    constraints: const BoxConstraints(maxWidth: 420),
-                    child: Card(
-                      child: Padding(
-                        padding: const EdgeInsets.all(16),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.stretch,
-                          children: [
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                const Text('Subtotal', style: TextStyle(fontWeight: FontWeight.w600)),
-                                Text('\$${subtotal.toStringAsFixed(0)}',
-                                    style: const TextStyle(fontWeight: FontWeight.w800)),
-                              ],
-                            ),
-                            const SizedBox(height: 8),
-                            const Text('Taxes and shipping are calculated at checkout.',
-                                style: TextStyle(fontSize: 12, color: Colors.white60)),
-                            const SizedBox(height: 12),
-                            FilledButton(
-                              onPressed: () {},
-                              child: const Text('Checkout'),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ),
-                  ),
-                ),
+                const SizedBox(height: 12),
               ],
             ),
           ),
         ),
+
+        // B) Subtotal 
+        SliverToBoxAdapter(
+          child: Card(
+            margin: EdgeInsets.zero, // edge-to-edge
+            child: Padding(
+              padding: const EdgeInsets.all(16),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start, // left align content
+                children: [
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      const Text('Subtotal', style: TextStyle(fontWeight: FontWeight.w600)),
+                      Text('\$${subtotal.toStringAsFixed(0)}',
+                          style: const TextStyle(fontWeight: FontWeight.w800)),
+                    ],
+                  ),
+                  const SizedBox(height: 8),
+                  const Text(
+                    'Taxes and shipping are calculated at checkout.',
+                    style: TextStyle(fontSize: 12, color: Colors.white60),
+                  ),
+                  const SizedBox(height: 12),
+
+                  // Checkout button on the LEFT (not stretched)
+                  Align(
+                    alignment: Alignment.centerLeft,
+                    child: FilledButton(
+                      onPressed: () {},
+                      child: const Text('Checkout'),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ),
+
       ],
     );
   }
 }
 
+//Cart Table summary (static, no real qty changes)
 class _CartHeaderRow extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
@@ -883,6 +990,7 @@ class _CartHeaderRow extends StatelessWidget {
   }
 }
 
+//Price summary (subtotal)
 class _CartRow extends StatelessWidget {
   final CartItem item;
   const _CartRow({required this.item});
@@ -930,7 +1038,7 @@ class _CartRow extends StatelessWidget {
   }
 }
 
-/* ============================ PRODUCT CARD =============================== */
+/* PRODUCT CARD */
 
 class ProductCard extends StatelessWidget {
   final Product product;
