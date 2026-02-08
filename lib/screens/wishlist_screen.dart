@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import '../models/product.dart';
+import '../models/wishlist_item.dart';
 import '../services/wishlist_service.dart';
 import 'product_detail_screen.dart';
 
@@ -12,7 +12,7 @@ class WishlistScreen extends StatefulWidget {
 
 class _WishlistScreenState extends State<WishlistScreen> {
   bool _loading = true;
-  List<Product> _items = [];
+  List<WishlistItem> _items = [];
 
   @override
   void initState() {
@@ -21,7 +21,9 @@ class _WishlistScreenState extends State<WishlistScreen> {
   }
 
   Future<void> _load() async {
-    final data = await WishlistService.getWishlist();
+    final List<WishlistItem> data =
+        await WishlistService.getWishlist();
+
     setState(() {
       _items = data;
       _loading = false;
@@ -49,7 +51,8 @@ class _WishlistScreenState extends State<WishlistScreen> {
                   separatorBuilder: (_, __) =>
                       const SizedBox(height: 12),
                   itemBuilder: (context, i) {
-                    final p = _items[i];
+                    final item = _items[i];
+                    final p = item.product;
 
                     return InkWell(
                       borderRadius: BorderRadius.circular(16),
@@ -71,12 +74,18 @@ class _WishlistScreenState extends State<WishlistScreen> {
                         child: Row(
                           children: [
                             ClipRRect(
-                              borderRadius: BorderRadius.circular(12),
+                              borderRadius:
+                                  BorderRadius.circular(12),
                               child: Image.network(
                                 p.imageUrl,
                                 width: 72,
                                 height: 72,
                                 fit: BoxFit.cover,
+                                errorBuilder: (_, __, ___) =>
+                                    const Icon(
+                                  Icons.image_not_supported,
+                                  color: Colors.white38,
+                                ),
                               ),
                             ),
                             const SizedBox(width: 12),
@@ -89,31 +98,38 @@ class _WishlistScreenState extends State<WishlistScreen> {
                                     p.brand,
                                     style: theme.textTheme.labelSmall
                                         ?.copyWith(
-                                            color: theme
-                                                .colorScheme.primary),
+                                      color: theme
+                                          .colorScheme.primary,
+                                    ),
                                   ),
                                   Text(
                                     p.model,
                                     maxLines: 1,
-                                    overflow: TextOverflow.ellipsis,
-                                    style: theme.textTheme.titleMedium,
+                                    overflow:
+                                        TextOverflow.ellipsis,
+                                    style:
+                                        theme.textTheme.titleMedium,
                                   ),
                                   const SizedBox(height: 4),
                                   Text(
                                     '\$${p.price.toStringAsFixed(2)}',
                                     style: const TextStyle(
-                                        fontWeight: FontWeight.w600),
+                                        fontWeight:
+                                            FontWeight.w600),
                                   ),
                                 ],
                               ),
                             ),
                             IconButton(
-                              icon: const Icon(Icons.delete_outline),
+                              icon: const Icon(
+                                Icons.favorite,
+                                color: Colors.redAccent,
+                              ),
                               onPressed: () async {
                                 await WishlistService.toggle(p);
                                 _load();
                               },
-                            )
+                            ),
                           ],
                         ),
                       ),

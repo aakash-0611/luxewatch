@@ -6,6 +6,11 @@ import 'services/api_service.dart';
 import 'widgets/product_card.dart';
 import 'widgets/user_menu_action.dart';
 import 'models/product.dart';
+import 'screens/wishlist_screen.dart';
+import 'screens/cart_screen.dart';
+import 'widgets/search_bar.dart';
+
+
 
 // ================= THEME MODE =================
 
@@ -73,20 +78,47 @@ class HomeShell extends StatefulWidget {
 class _HomeShellState extends State<HomeShell> {
   int _index = 0;
 
+  Widget _buildBody(bool isTablet) {
+    switch (_index) {
+      case 0:
+        return LuxeHome(isTablet: isTablet);
+      case 1:
+        return const ProductsPage();
+      case 2:
+        return const WishlistScreen();
+      case 3:
+        return const CartScreen();
+      default:
+        return LuxeHome(isTablet: isTablet);
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final isTablet = MediaQuery.of(context).size.width >= 900;
-
+  
     return Scaffold(
-      body: _index == 0
-          ? LuxeHome(isTablet: isTablet)
-          : const ProductsPage(),
+      body: _buildBody(isTablet),
       bottomNavigationBar: NavigationBar(
         selectedIndex: _index,
         onDestinationSelected: (i) => setState(() => _index = i),
         destinations: const [
-          NavigationDestination(icon: Icon(Icons.home), label: 'Home'),
-          NavigationDestination(icon: Icon(Icons.storefront), label: 'Products'),
+          NavigationDestination(
+            icon: Icon(Icons.home),
+            label: 'Home',
+          ),
+          NavigationDestination(
+            icon: Icon(Icons.storefront),
+            label: 'Products',
+          ),
+          NavigationDestination(
+            icon: Icon(Icons.favorite_border),
+            label: 'Wishlist',
+          ),
+          NavigationDestination(
+            icon: Icon(Icons.shopping_bag_outlined),
+            label: 'Cart',
+          ),
         ],
       ),
     );
@@ -105,6 +137,7 @@ class LuxeHome extends StatefulWidget {
 
 class _LuxeHomeState extends State<LuxeHome> {
   bool _loading = true;
+  String _query = '';
   List<Product> _products = [];
 
   @override
@@ -116,21 +149,33 @@ class _LuxeHomeState extends State<LuxeHome> {
   Future<void> _loadProducts() async {
     try {
       final apiProducts = await ProductService.getProducts();
-      _products = apiProducts
-          .map((p) => Product(
-                id: p.id,
-                brand: p.brand,
-                model: p.model,
-                imageUrl: p.imageUrl,
-                price: p.price,
-              ))
-          .toList();
+      setState(() {
+        _products = apiProducts
+            .map((p) => Product(
+                  id: p.id,
+                  brand: p.brand,
+                  model: p.model,
+                  imageUrl: p.imageUrl,
+                  price: p.price,
+                ))
+            .toList();
+      });
     } catch (_) {
-      _products = [];
+      setState(() => _products = []);
     } finally {
       setState(() => _loading = false);
     }
   }
+  List<Product> get _filteredProducts {
+    if (_query.isEmpty) return _products;
+
+    final q = _query.toLowerCase();
+    return _products.where((p) {
+      return p.brand.toLowerCase().contains(q) ||
+            p.model.toLowerCase().contains(q);
+    }).toList();
+  }
+
 
   @override
   Widget build(BuildContext context) {
@@ -138,14 +183,12 @@ class _LuxeHomeState extends State<LuxeHome> {
       return const Center(child: CircularProgressIndicator());
     }
 
-    if (_products.isEmpty) {
-      return const Center(
-        child: Text('No products available',
-            style: TextStyle(color: Colors.white54)),
-      );
-    }
-
-    final featured = _products.take(4).toList();
+    final filtered = _filteredProducts
+        .where((p) =>
+            p.brand.toLowerCase().contains(_query.toLowerCase()) ||
+            p.model.toLowerCase().contains(_query.toLowerCase()))
+        .take(4)
+        .toList();
 
     return CustomScrollView(
       slivers: [
@@ -154,32 +197,49 @@ class _LuxeHomeState extends State<LuxeHome> {
           title: const Text('LUXEWATCH'),
           actions: const [UserMenuAction()],
         ),
-
+        
+        // SEARCH
         SliverToBoxAdapter(
           child: Padding(
-            padding: const EdgeInsets.fromLTRB(16, 16, 16, 8),
-            child: Text('Explore',
-                style: Theme.of(context).textTheme.headlineSmall),
+            padding: const EdgeInsets.fromLTRB(16, 12, 16, 8),
+            child: LuxeSearchBar(
+              hint: 'Search luxury watches',
+              onChanged: (value) {
+                setState(() => _query = value);
+              },
+            ),
           ),
         ),
 
+        // TITLE
+        SliverToBoxAdapter(
+          child: Padding(
+            padding: const EdgeInsets.fromLTRB(16, 16, 16, 8),
+            child: Text(
+              'Featured',
+              style: Theme.of(context).textTheme.headlineSmall,
+            ),
+          ),
+        ),
+
+        // GRID
         SliverPadding(
           padding: const EdgeInsets.all(16),
           sliver: SliverGrid(
             delegate: SliverChildBuilderDelegate(
               (context, i) => ProductCard(
-                product: featured[i],
+                product: filtered[i],
                 onTap: () {
                   Navigator.push(
                     context,
                     MaterialPageRoute(
                       builder: (_) =>
-                          ProductDetailScreen(product: featured[i]),
+                          ProductDetailScreen(product: filtered[i]),
                     ),
                   );
                 },
               ),
-              childCount: featured.length,
+              childCount: filtered.length,
             ),
             gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
               crossAxisCount: widget.isTablet ? 4 : 2,
@@ -205,6 +265,7 @@ class ProductsPage extends StatefulWidget {
 
 class _ProductsPageState extends State<ProductsPage> {
   bool _loading = true;
+  String _query = '';
   String _selectedBrand = 'All';
 
   final List<String> _brands = [
@@ -218,11 +279,18 @@ class _ProductsPageState extends State<ProductsPage> {
   List<Product> _products = [];
 
   List<Product> get _filteredProducts {
-    if (_selectedBrand == 'All') return _products;
-    return _products
-        .where((p) =>
-            p.brand.toLowerCase() == _selectedBrand.toLowerCase())
-        .toList();
+    return _products.where((p) {
+      final matchesBrand =
+          _selectedBrand == 'All' ||
+          p.brand.toLowerCase() == _selectedBrand.toLowerCase();
+
+      final matchesQuery =
+          _query.isEmpty ||
+          p.brand.toLowerCase().contains(_query.toLowerCase()) ||
+          p.model.toLowerCase().contains(_query.toLowerCase());
+
+      return matchesBrand && matchesQuery;
+    }).toList();
   }
 
   @override
@@ -234,17 +302,19 @@ class _ProductsPageState extends State<ProductsPage> {
   Future<void> _loadProducts() async {
     try {
       final apiProducts = await ProductService.getProducts();
-      _products = apiProducts
-          .map((p) => Product(
-                id: p.id,
-                brand: p.brand,
-                model: p.model,
-                imageUrl: p.imageUrl,
-                price: p.price,
-              ))
-          .toList();
+      setState(() {
+        _products = apiProducts
+            .map((p) => Product(
+                  id: p.id,
+                  brand: p.brand,
+                  model: p.model,
+                  imageUrl: p.imageUrl,
+                  price: p.price,
+                ))
+            .toList();
+      });
     } catch (_) {
-      _products = [];
+      setState(() => _products = []);
     } finally {
       setState(() => _loading = false);
     }
@@ -262,6 +332,21 @@ class _ProductsPageState extends State<ProductsPage> {
           actions: const [UserMenuAction()],
         ),
 
+        // SEARCH
+        SliverToBoxAdapter(
+          child: Padding(
+            padding: const EdgeInsets.fromLTRB(16, 12, 16, 8),
+            child: LuxeSearchBar(
+              hint: 'Search collection',
+              onChanged: (value) {
+                setState(() => _query = value);
+              },
+            ),
+          ),
+        ),
+
+
+        // BRAND FILTERS
         SliverToBoxAdapter(
           child: SizedBox(
             height: 44,
@@ -291,6 +376,7 @@ class _ProductsPageState extends State<ProductsPage> {
           ),
         ),
 
+        // CONTENT
         if (_loading)
           const SliverFillRemaining(
             child: Center(child: CircularProgressIndicator()),

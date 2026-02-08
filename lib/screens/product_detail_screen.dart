@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import '../models/product.dart';
+import '../services/cart_service.dart';
+
 
 class ProductDetailScreen extends StatelessWidget {
   final Product product;
@@ -141,8 +143,17 @@ class ProductDetailScreen extends StatelessWidget {
                               borderRadius: BorderRadius.circular(14),
                             ),
                           ),
-                          onPressed: () {
-                            // TODO: Add to cart
+                          onPressed: () async {
+                            await CartService.add(product);
+
+                            if (!context.mounted) return;
+
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(
+                                content: Text('Added to cart'),
+                                behavior: SnackBarBehavior.floating,
+                              ),
+                            );
                           },
                           child: const Text(
                             'Add to Cart',
@@ -154,9 +165,16 @@ class ProductDetailScreen extends StatelessWidget {
                         ),
                       ),
                       const SizedBox(width: 12),
+
+                      // Wishlist (placeholder – backend ready)
                       IconButton(
                         onPressed: () {
-                          // TODO: Add to wishlist
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(
+                              content: Text('Wishlist coming soon'),
+                              behavior: SnackBarBehavior.floating,
+                            ),
+                          );
                         },
                         icon: const Icon(Icons.favorite_border),
                         color: Colors.white70,
@@ -167,6 +185,7 @@ class ProductDetailScreen extends StatelessWidget {
                       ),
                     ],
                   ),
+
 
                   const SizedBox(height: 32),
                 ],

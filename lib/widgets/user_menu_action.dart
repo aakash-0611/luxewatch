@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import '../screens/profile_screen.dart';
+
 
 class UserMenuAction extends StatelessWidget {
   const UserMenuAction({super.key});
@@ -10,11 +12,14 @@ class UserMenuAction extends StatelessWidget {
       onSelected: (value) {
         switch (value) {
           case 'profile':
-            // TODO: Navigate to profile page
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (_) => const ProfileScreen(),
+              ),
+          );
             break;
-
           case 'logout':
-            // TODO: Call AuthService.logout()
             break;
         }
       },

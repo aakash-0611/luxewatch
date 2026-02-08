@@ -34,9 +34,14 @@ class ApiService {
     return token != null && token.isNotEmpty;
   }
 
-  /// Clear token on logout
+  /// Clear token from storage + headers
   static Future<void> clearToken() async {
     await _storage.delete(key: _tokenKey);
     dio.options.headers.remove('Authorization');
+  }
+
+  /// Logout wrapper (semantic, UI-friendly)
+  static Future<void> logout() async {
+    await clearToken();
   }
 }
