@@ -1,6 +1,8 @@
-// Splash screen 
+// Splash screen
 
 import 'package:flutter/material.dart';
+import '../services/api_service.dart';
+import '../main.dart'; // HomeShell
 import 'onboarding_screen.dart';
 
 class SplashScreen extends StatefulWidget {
@@ -12,20 +14,34 @@ class SplashScreen extends StatefulWidget {
 
 class _SplashScreenState extends State<SplashScreen>
     with SingleTickerProviderStateMixin {
+
   @override
   void initState() {
     super.initState();
-    Future.delayed(const Duration(seconds: 3), () {
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(builder: (_) => const OnboardingScreen()),
-      );
-    });
+    _handleNavigation();
+  }
+
+  Future<void> _handleNavigation() async {
+    // Keep your splash delay
+    await Future.delayed(const Duration(seconds: 3));
+
+    final loggedIn = await ApiService.isLoggedIn();
+
+    if (!mounted) return;
+
+    Navigator.pushReplacement(
+      context,
+      MaterialPageRoute(
+        builder: (_) =>
+            loggedIn ? const HomeShell() : const OnboardingScreen(),
+      ),
+    );
   }
 
   @override
   Widget build(BuildContext context) {
     final cs = Theme.of(context).colorScheme;
+
     return Scaffold(
       backgroundColor: const Color(0xFF0B0F14),
       body: Center(

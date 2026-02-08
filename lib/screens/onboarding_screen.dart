@@ -23,7 +23,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
     _OnboardData(
       title: 'Curated Just for You',
       desc: 'Personalized recommendations based on your taste and style.',
-      image: 'assets/images/watch2.png',
+      image: 'assets/images/tag_carrera.png',
     ),
     _OnboardData(
       title: 'Easy Shopping Experience',
