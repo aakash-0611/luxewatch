@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:dio/dio.dart';
 import '../services/auth_service.dart';
 
 class RegisterScreen extends StatefulWidget {
@@ -12,11 +13,20 @@ class _RegisterScreenState extends State<RegisterScreen> {
   final _nameController = TextEditingController();
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
+  final _confirmPasswordController = TextEditingController();
 
   bool _loading = false;
   String? _error;
 
   Future<void> _register() async {
+    if (_passwordController.text !=
+        _confirmPasswordController.text) {
+      setState(() {
+        _error = 'Passwords do not match';
+      });
+      return;
+    }
+
     setState(() {
       _loading = true;
       _error = null;
@@ -26,26 +36,47 @@ class _RegisterScreenState extends State<RegisterScreen> {
       await AuthService.register(
         _nameController.text.trim(),
         _emailController.text.trim(),
-        _passwordController.text.trim(),
+        _passwordController.text,
       );
 
       if (!mounted) return;
 
-      // After successful register → go back to login
-      Navigator.pop(context);
-    } 
-    catch (e) {
-      debugPrint('REGISTER ERROR: $e');
+      // ✅ Show success feedback
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Account created successfully. Please log in.'),
+          backgroundColor: Colors.green,
+        ),
+      );
 
+      // ✅ Go back to login screen
+      Navigator.pop(context);
+
+    } on DioException catch (e) {
+      if (e.response?.statusCode == 422) {
+        final errors = e.response?.data['errors'];
+        String message = 'Invalid input';
+
+        if (errors != null && errors is Map) {
+          message = errors.values.first[0];
+        }
+
+        setState(() {
+          _error = message;
+        });
+      } else {
+        setState(() {
+          _error = 'Something went wrong. Please try again.';
+        });
+      }
+    } catch (_) {
       setState(() {
-        _error = e.toString();
+        _error = 'Unexpected error occurred.';
       });
-    }
-    
-    finally {
-      setState(() {
-        _loading = false;
-      });
+    } finally {
+      if (mounted) {
+        setState(() => _loading = false);
+      }
     }
   }
 
@@ -61,7 +92,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
         elevation: 0,
         title: const Text('Create Account'),
       ),
-      body: Padding(
+      body: SingleChildScrollView(
         padding: const EdgeInsets.all(24),
         child: Column(
           children: [
@@ -86,37 +117,64 @@ class _RegisterScreenState extends State<RegisterScreen> {
               style: const TextStyle(color: Colors.white),
               decoration: _inputDecoration('Password'),
             ),
+            const SizedBox(height: 16),
+
+            TextField(
+              controller: _confirmPasswordController,
+              obscureText: true,
+              style: const TextStyle(color: Colors.white),
+              decoration: _inputDecoration('Confirm Password'),
+            ),
 
             const SizedBox(height: 24),
 
             if (_error != null)
-              Text(
-                _error!,
-                style: const TextStyle(color: Colors.redAccent),
-              ),
-
-            const SizedBox(height: 24),
-
-            FilledButton(
-              onPressed: _loading ? null : _register,
-              style: ButtonStyle(
-                backgroundColor: WidgetStatePropertyAll(cs.primary),
-                foregroundColor:
-                    const WidgetStatePropertyAll(Colors.black),
-                padding: const WidgetStatePropertyAll(
-                  EdgeInsets.symmetric(horizontal: 48, vertical: 16),
+              Padding(
+                padding: const EdgeInsets.only(bottom: 12),
+                child: Text(
+                  _error!,
+                  style: const TextStyle(color: Colors.redAccent),
+                  textAlign: TextAlign.center,
                 ),
               ),
-              child: _loading
-                  ? const SizedBox(
-                      height: 20,
-                      width: 20,
-                      child: CircularProgressIndicator(
-                        strokeWidth: 2,
-                        color: Colors.black,
+
+            const SizedBox(height: 12),
+
+            SizedBox(
+              width: double.infinity,
+              child: FilledButton(
+                onPressed: _loading ? null : _register,
+                style: ButtonStyle(
+                  backgroundColor:
+                      WidgetStatePropertyAll(cs.primary),
+                  foregroundColor:
+                      const WidgetStatePropertyAll(Colors.black),
+                  padding: const WidgetStatePropertyAll(
+                    EdgeInsets.symmetric(vertical: 16),
+                  ),
+                  shape: WidgetStatePropertyAll(
+                    RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(14),
+                    ),
+                  ),
+                ),
+                child: _loading
+                    ? const SizedBox(
+                        height: 22,
+                        width: 22,
+                        child: CircularProgressIndicator(
+                          strokeWidth: 2,
+                          color: Colors.black,
+                        ),
+                      )
+                    : const Text(
+                        'Register',
+                        style: TextStyle(
+                          fontWeight: FontWeight.w700,
+                          fontSize: 16,
+                        ),
                       ),
-                    )
-                  : const Text('Register'),
+              ),
             ),
           ],
         ),

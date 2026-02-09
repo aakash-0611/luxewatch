@@ -9,8 +9,12 @@ import 'models/product.dart';
 import 'screens/wishlist_screen.dart';
 import 'screens/cart_screen.dart';
 import 'widgets/search_bar.dart';
-
-
+import 'services/theme_service.dart';
+import 'package:provider/provider.dart';
+import 'providers/auth_provider.dart';
+import 'providers/connectivity_provider.dart';
+import 'providers/battery_provider.dart';
+import 'widgets/luxe_hero.dart';
 
 // ================= THEME MODE =================
 
@@ -20,10 +24,14 @@ final ValueNotifier<ThemeMode> appThemeMode =
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await ApiService.loadToken();
+
+  final savedTheme = await ThemeService.loadTheme();
+  appThemeMode.value = savedTheme;
+
   runApp(const LuxeWatchApp());
 }
 
-/* ================= APP ROOT ================= */
+// ================= APP ROOT =================
 
 class LuxeWatchApp extends StatelessWidget {
   const LuxeWatchApp({super.key});
@@ -54,19 +62,29 @@ class LuxeWatchApp extends StatelessWidget {
     return ValueListenableBuilder<ThemeMode>(
       valueListenable: appThemeMode,
       builder: (_, mode, __) {
-        return MaterialApp(
-          debugShowCheckedModeBanner: false,
-          title: 'LuxeWatch',
-          theme: darkTheme,
-          themeMode: mode,
-          home: const SplashScreen(),
+        return MultiProvider(
+          providers: [
+            ChangeNotifierProvider(
+              create: (_) => AuthProvider()..loadProfile(),
+            ),
+            ChangeNotifierProvider(create: (_) => ConnectivityProvider()),
+            ChangeNotifierProvider(create: (_) => BatteryProvider()),
+          ],
+          child: MaterialApp(
+            debugShowCheckedModeBanner: false,
+            title: 'LuxeWatch',
+            theme: darkTheme,
+            themeMode: mode,
+            home: const SplashScreen(),
+          ),
+
         );
       },
     );
   }
 }
 
-/* ================= HOME SHELL ================= */
+// ================= HOME SHELL =================
 
 class HomeShell extends StatefulWidget {
   const HomeShell({super.key});
@@ -78,10 +96,14 @@ class HomeShell extends StatefulWidget {
 class _HomeShellState extends State<HomeShell> {
   int _index = 0;
 
-  Widget _buildBody(bool isTablet) {
+  Widget _page(bool isTablet) {
     switch (_index) {
       case 0:
-        return LuxeHome(isTablet: isTablet);
+        return LuxeHome(isTablet: isTablet,
+            onShop: () =>
+              setState(() => _index = 1),
+              
+        );
       case 1:
         return const ProductsPage();
       case 2:
@@ -89,47 +111,105 @@ class _HomeShellState extends State<HomeShell> {
       case 3:
         return const CartScreen();
       default:
-        return LuxeHome(isTablet: isTablet);
+        return LuxeHome(isTablet: isTablet,
+            onShop: () =>
+              setState(() => _index = 1),
+              
+        );
     }
   }
 
   @override
   Widget build(BuildContext context) {
     final isTablet = MediaQuery.of(context).size.width >= 900;
-  
+
+    // ===== MOBILE =====
+    if (!isTablet) {
+      return Scaffold(
+        body: _page(false),
+        bottomNavigationBar: NavigationBar(
+          selectedIndex: _index,
+          onDestinationSelected: (i) => setState(() => _index = i),
+          destinations: const [
+            NavigationDestination(
+              icon: Icon(Icons.home_outlined),
+              selectedIcon: Icon(Icons.home),
+              label: 'Home',
+            ),
+            NavigationDestination(
+              icon: Icon(Icons.storefront_outlined),
+              selectedIcon: Icon(Icons.storefront),
+              label: 'Products',
+            ),
+            NavigationDestination(
+              icon: Icon(Icons.favorite_border),
+              selectedIcon: Icon(Icons.favorite),
+              label: 'Wishlist',
+            ),
+            NavigationDestination(
+              icon: Icon(Icons.shopping_bag_outlined),
+              selectedIcon: Icon(Icons.shopping_bag),
+              label: 'Cart',
+            ),
+          ],
+        ),
+        
+      );
+    }
+
+    // ===== TABLET / LANDSCAPE =====
     return Scaffold(
-      body: _buildBody(isTablet),
-      bottomNavigationBar: NavigationBar(
-        selectedIndex: _index,
-        onDestinationSelected: (i) => setState(() => _index = i),
-        destinations: const [
-          NavigationDestination(
-            icon: Icon(Icons.home),
-            label: 'Home',
+      body: Row(
+        children: [
+          NavigationRail(
+            selectedIndex: _index,
+            onDestinationSelected: (i) => setState(() => _index = i),
+            extended: true,
+            backgroundColor: const Color(0xFF0B0F14),
+            selectedIconTheme: IconThemeData(
+              color: Theme.of(context).colorScheme.primary,
+            ),
+            selectedLabelTextStyle: TextStyle(
+              color: Theme.of(context).colorScheme.primary,
+              fontWeight: FontWeight.w600,
+            ),
+            destinations: const [
+              NavigationRailDestination(
+                icon: Icon(Icons.home_outlined),
+                selectedIcon: Icon(Icons.home),
+                label: Text('Home'),
+              ),
+              NavigationRailDestination(
+                icon: Icon(Icons.storefront_outlined),
+                selectedIcon: Icon(Icons.storefront),
+                label: Text('Products'),
+              ),
+              NavigationRailDestination(
+                icon: Icon(Icons.favorite_border),
+                selectedIcon: Icon(Icons.favorite),
+                label: Text('Wishlist'),
+              ),
+              NavigationRailDestination(
+                icon: Icon(Icons.shopping_bag_outlined),
+                selectedIcon: Icon(Icons.shopping_bag),
+                label: Text('Cart'),
+              ),
+            ],
           ),
-          NavigationDestination(
-            icon: Icon(Icons.storefront),
-            label: 'Products',
-          ),
-          NavigationDestination(
-            icon: Icon(Icons.favorite_border),
-            label: 'Wishlist',
-          ),
-          NavigationDestination(
-            icon: Icon(Icons.shopping_bag_outlined),
-            label: 'Cart',
-          ),
+          const VerticalDivider(width: 1),
+          Expanded(child: _page(true)),
         ],
       ),
     );
   }
 }
 
-/* ================= HOME ================= */
+// ================= HOME =================
 
 class LuxeHome extends StatefulWidget {
   final bool isTablet;
-  const LuxeHome({super.key, required this.isTablet});
+  final VoidCallback onShop;
+  const LuxeHome({super.key, required this.isTablet, required this.onShop});
 
   @override
   State<LuxeHome> createState() => _LuxeHomeState();
@@ -147,35 +227,39 @@ class _LuxeHomeState extends State<LuxeHome> {
   }
 
   Future<void> _loadProducts() async {
-    try {
-      final apiProducts = await ProductService.getProducts();
-      setState(() {
-        _products = apiProducts
-            .map((p) => Product(
-                  id: p.id,
-                  brand: p.brand,
-                  model: p.model,
-                  imageUrl: p.imageUrl,
-                  price: p.price,
-                ))
-            .toList();
-      });
-    } catch (_) {
-      setState(() => _products = []);
-    } finally {
-      setState(() => _loading = false);
-    }
+  try {
+    final apiProducts = await ProductService.getProducts();
+
+    setState(() {
+      _products = apiProducts
+          .map((p) => Product(
+                id: p.id,
+                brand: p.brand,
+                model: p.model,
+                imageUrl: p.imageUrl,
+                price: p.price,
+              ))
+          .toList();
+    });
+  } catch (_) {
+    setState(() {
+      _products = [];
+    });
+  } finally {
+    setState(() => _loading = false);
   }
-  List<Product> get _filteredProducts {
+}
+
+
+  List<Product> get _filtered {
     if (_query.isEmpty) return _products;
-
     final q = _query.toLowerCase();
-    return _products.where((p) {
-      return p.brand.toLowerCase().contains(q) ||
-            p.model.toLowerCase().contains(q);
-    }).toList();
+    return _products
+        .where((p) =>
+            p.brand.toLowerCase().contains(q) ||
+            p.model.toLowerCase().contains(q))
+        .toList();
   }
-
 
   @override
   Widget build(BuildContext context) {
@@ -183,35 +267,37 @@ class _LuxeHomeState extends State<LuxeHome> {
       return const Center(child: CircularProgressIndicator());
     }
 
-    final filtered = _filteredProducts
-        .where((p) =>
-            p.brand.toLowerCase().contains(_query.toLowerCase()) ||
-            p.model.toLowerCase().contains(_query.toLowerCase()))
-        .take(4)
-        .toList();
+    final featured = _filtered.take(4).toList();
 
     return CustomScrollView(
       slivers: [
+
         SliverAppBar(
           pinned: true,
           title: const Text('LUXEWATCH'),
           actions: const [UserMenuAction()],
         ),
-        
-        // SEARCH
+
         SliverToBoxAdapter(
           child: Padding(
             padding: const EdgeInsets.fromLTRB(16, 12, 16, 8),
             child: LuxeSearchBar(
-              hint: 'Search luxury watches',
-              onChanged: (value) {
-                setState(() => _query = value);
+              hint: 'Search collection',
+              onChanged: (v) => setState(() => _query = v),
+            ),
+          ),
+        ),
+
+        SliverToBoxAdapter(
+          child: Padding(
+            padding: const EdgeInsets.all(16),
+            child: LuxeHero(
+              onShop: () {
               },
             ),
           ),
         ),
 
-        // TITLE
         SliverToBoxAdapter(
           child: Padding(
             padding: const EdgeInsets.fromLTRB(16, 16, 16, 8),
@@ -222,24 +308,23 @@ class _LuxeHomeState extends State<LuxeHome> {
           ),
         ),
 
-        // GRID
         SliverPadding(
           padding: const EdgeInsets.all(16),
           sliver: SliverGrid(
             delegate: SliverChildBuilderDelegate(
               (context, i) => ProductCard(
-                product: filtered[i],
+                product: featured[i],
                 onTap: () {
                   Navigator.push(
                     context,
                     MaterialPageRoute(
                       builder: (_) =>
-                          ProductDetailScreen(product: filtered[i]),
+                          ProductDetailScreen(product: featured[i]),
                     ),
                   );
                 },
               ),
-              childCount: filtered.length,
+              childCount: featured.length,
             ),
             gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
               crossAxisCount: widget.isTablet ? 4 : 2,
@@ -254,7 +339,7 @@ class _LuxeHomeState extends State<LuxeHome> {
   }
 }
 
-/* ================= PRODUCTS PAGE ================= */
+// ================= PRODUCTS PAGE =================
 
 class ProductsPage extends StatefulWidget {
   const ProductsPage({super.key});
@@ -268,30 +353,8 @@ class _ProductsPageState extends State<ProductsPage> {
   String _query = '';
   String _selectedBrand = 'All';
 
-  final List<String> _brands = [
-    'All',
-    'Rolex',
-    'Omega',
-    'IWC',
-    'Patek',
-  ];
-
+  final _brands = ['All', 'Rolex', 'Omega', 'IWC'];
   List<Product> _products = [];
-
-  List<Product> get _filteredProducts {
-    return _products.where((p) {
-      final matchesBrand =
-          _selectedBrand == 'All' ||
-          p.brand.toLowerCase() == _selectedBrand.toLowerCase();
-
-      final matchesQuery =
-          _query.isEmpty ||
-          p.brand.toLowerCase().contains(_query.toLowerCase()) ||
-          p.model.toLowerCase().contains(_query.toLowerCase());
-
-      return matchesBrand && matchesQuery;
-    }).toList();
-  }
 
   @override
   void initState() {
@@ -302,6 +365,7 @@ class _ProductsPageState extends State<ProductsPage> {
   Future<void> _loadProducts() async {
     try {
       final apiProducts = await ProductService.getProducts();
+
       setState(() {
         _products = apiProducts
             .map((p) => Product(
@@ -314,10 +378,28 @@ class _ProductsPageState extends State<ProductsPage> {
             .toList();
       });
     } catch (_) {
-      setState(() => _products = []);
+      setState(() {
+        _products = [];
+      });
     } finally {
       setState(() => _loading = false);
     }
+  }
+
+
+  List<Product> get _filtered {
+    return _products.where((p) {
+      final brandOk =
+          _selectedBrand == 'All' ||
+          p.brand.toLowerCase() == _selectedBrand.toLowerCase();
+
+      final queryOk =
+          _query.isEmpty ||
+          p.brand.toLowerCase().contains(_query.toLowerCase()) ||
+          p.model.toLowerCase().contains(_query.toLowerCase());
+
+      return brandOk && queryOk;
+    }).toList();
   }
 
   @override
@@ -332,36 +414,31 @@ class _ProductsPageState extends State<ProductsPage> {
           actions: const [UserMenuAction()],
         ),
 
-        // SEARCH
         SliverToBoxAdapter(
           child: Padding(
             padding: const EdgeInsets.fromLTRB(16, 12, 16, 8),
             child: LuxeSearchBar(
               hint: 'Search collection',
-              onChanged: (value) {
-                setState(() => _query = value);
-              },
+              onChanged: (v) => setState(() => _query = v),
             ),
           ),
         ),
 
-
-        // BRAND FILTERS
         SliverToBoxAdapter(
           child: SizedBox(
             height: 44,
             child: ListView(
               padding: const EdgeInsets.symmetric(horizontal: 16),
               scrollDirection: Axis.horizontal,
-              children: _brands.map((brand) {
-                final selected = brand == _selectedBrand;
+              children: _brands.map((b) {
+                final selected = b == _selectedBrand;
                 return Padding(
                   padding: const EdgeInsets.only(right: 8),
                   child: ChoiceChip(
-                    label: Text(brand),
+                    label: Text(b),
                     selected: selected,
                     onSelected: (_) =>
-                        setState(() => _selectedBrand = brand),
+                        setState(() => _selectedBrand = b),
                     selectedColor:
                         Theme.of(context).colorScheme.primary,
                     backgroundColor: const Color(0xFF121826),
@@ -376,7 +453,6 @@ class _ProductsPageState extends State<ProductsPage> {
           ),
         ),
 
-        // CONTENT
         if (_loading)
           const SliverFillRemaining(
             child: Center(child: CircularProgressIndicator()),
@@ -387,18 +463,18 @@ class _ProductsPageState extends State<ProductsPage> {
             sliver: SliverGrid(
               delegate: SliverChildBuilderDelegate(
                 (context, i) => ProductCard(
-                  product: _filteredProducts[i],
+                  product: _filtered[i],
                   onTap: () {
                     Navigator.push(
                       context,
                       MaterialPageRoute(
-                        builder: (_) => ProductDetailScreen(
-                            product: _filteredProducts[i]),
+                        builder: (_) =>
+                            ProductDetailScreen(product: _filtered[i]),
                       ),
                     );
                   },
                 ),
-                childCount: _filteredProducts.length,
+                childCount: _filtered.length,
               ),
               gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
                 crossAxisCount: isWide ? 4 : 2,

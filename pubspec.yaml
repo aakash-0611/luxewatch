@@ -12,6 +12,8 @@ dependencies:
     sdk: flutter
   shared_preferences: ^2.2.2
   provider: ^6.1.2
+  battery_plus: ^5.0.3
+  connectivity_plus: ^6.0.3
 
 
   # UI

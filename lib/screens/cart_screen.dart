@@ -142,7 +142,7 @@ class _CartScreenState extends State<CartScreen> {
                       ),
                     ),
 
-                    // ===== CHECKOUT BAR =====
+                    // CHECKOUT BAR
                     Container(
                       padding: const EdgeInsets.all(16),
                       decoration: const BoxDecoration(

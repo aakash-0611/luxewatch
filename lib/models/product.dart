@@ -21,5 +21,6 @@ class Product {
       imageUrl: json['image_url'],
       price: double.parse(json['price'].toString()),
     );
+    
   }
 }
